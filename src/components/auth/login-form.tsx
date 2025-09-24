@@ -12,12 +12,15 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export function LoginForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const emailRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -26,6 +29,22 @@ export function LoginForm() {
     setTimeout(() => {
       router.push('/dashboard');
     }, 1000);
+  };
+
+  const handlePasswordReset = () => {
+    const email = emailRef.current?.value;
+    if (email) {
+      toast({
+        title: 'Password Reset Requested',
+        description: `A password reset request has been sent for ${email}. The PCO has been notified.`,
+      });
+    } else {
+      toast({
+        title: 'Email Required',
+        description: 'Please enter your email address before requesting a password reset.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -46,6 +65,7 @@ export function LoginForm() {
               placeholder="m@example.com"
               defaultValue="admin@invorg.com"
               required
+              ref={emailRef}
             />
           </div>
           <div className="space-y-2">
@@ -58,9 +78,15 @@ export function LoginForm() {
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Sign In
           </Button>
-          <p className="text-xs text-muted-foreground">
-            Contact PCO for password reset requests.
-          </p>
+          <Button
+            type="button"
+            variant="link"
+            size="sm"
+            className="text-xs text-muted-foreground"
+            onClick={handlePasswordReset}
+          >
+            Contact PCO for password reset
+          </Button>
         </CardFooter>
       </Card>
     </form>
