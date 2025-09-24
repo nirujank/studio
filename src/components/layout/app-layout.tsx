@@ -42,7 +42,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             {/* Can add footer items here */}
           </SidebarFooter>
         </Sidebar>
-        <SidebarInset>
+        <div className="flex-1">
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
             <SidebarTrigger />
             <div className="flex-1">
@@ -53,7 +53,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <UserNav />
           </header>
           <main className="flex-1 p-4 sm:p-6">{children}</main>
-        </SidebarInset>
+        </div>
       </div>
     </SidebarProvider>
   );
