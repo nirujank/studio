@@ -40,6 +40,7 @@ import type { StaffMember } from '@/lib/data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 type StaffTableProps = {
   staffData: StaffMember[];
@@ -50,6 +51,7 @@ export function StaffTable({ staffData }: StaffTableProps) {
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<StaffMember | null>(null);
   const { toast } = useToast();
+  const router = useRouter();
 
   const filteredData = staffData.filter(
     (member) =>
@@ -73,6 +75,10 @@ export function StaffTable({ staffData }: StaffTableProps) {
     setResetDialogOpen(false);
     setSelectedUser(null);
   }
+
+  const handleEdit = (member: StaffMember) => {
+    router.push(`/staff/${member.id}/edit`);
+  };
 
   return (
     <>
@@ -98,9 +104,11 @@ export function StaffTable({ staffData }: StaffTableProps) {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            <Button>
-              <UserPlus className="mr-2 h-4 w-4" />
-              Add Staff
+            <Button asChild>
+              <Link href="/staff/new">
+                <UserPlus className="mr-2 h-4 w-4" />
+                Add Staff
+              </Link>
             </Button>
           </div>
         </div>
@@ -152,7 +160,7 @@ export function StaffTable({ staffData }: StaffTableProps) {
                       <DropdownMenuItem asChild>
                         <Link href="/profile">View Profile</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => handleEdit(member)}>Edit</DropdownMenuItem>
                       <DropdownMenuItem onSelect={() => handleResetPassword(member)}>
                         Reset Password
                       </DropdownMenuItem>
