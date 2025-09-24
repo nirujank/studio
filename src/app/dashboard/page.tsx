@@ -1,6 +1,5 @@
 import { AppLayout } from '@/components/layout/app-layout';
 import { StatsCards } from '@/components/dashboard/stats-cards';
-import { StaffTable } from '@/components/dashboard/staff-table';
 import { staffData } from '@/lib/data';
 
 export default function DashboardPage() {
@@ -14,7 +13,6 @@ export default function DashboardPage() {
           </p>
         </div>
         <StatsCards staffData={staffData} />
-        <StaffTable staffData={staffData} />
       </div>
     </AppLayout>
   );

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, UserCircle } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Users } from 'lucide-react';
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -15,6 +15,11 @@ const navItems = [
     href: '/dashboard',
     icon: LayoutDashboard,
     label: 'Dashboard',
+  },
+  {
+    href: '/staff',
+    icon: Users,
+    label: 'Staff',
   },
   {
     href: '/profile',
@@ -33,7 +38,7 @@ export function MainNav() {
           <SidebarMenuButton
             as={Link}
             href={item.href}
-            isActive={pathname === item.href}
+            isActive={pathname.startsWith(item.href)}
             tooltip={item.label}
           >
             <item.icon />
