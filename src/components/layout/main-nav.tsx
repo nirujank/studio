@@ -38,7 +38,7 @@ export function MainNav() {
           <SidebarMenuButton
             as={Link}
             href={item.href}
-            isActive={pathname.startsWith(item.href)}
+            isActive={pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))}
             tooltip={item.label}
           >
             <item.icon />

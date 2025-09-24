@@ -8,7 +8,6 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { Building } from 'lucide-react';
 import { MainNav } from './main-nav';
 import { UserNav } from './user-nav';
 import Link from 'next/link';
@@ -21,14 +20,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <div className="flex min-h-screen">
         <Sidebar className="flex flex-col" collapsible="icon">
-          <SidebarHeader className="border-b">
-            <div className="flex h-12 items-center gap-2.5 px-3">
+          <SidebarHeader className="border-b p-2">
+            <div className="flex h-10 items-center justify-center gap-2.5">
               <ButtonOrLink>
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg">
                   <Image src="/logo.png" alt="Invorg Logo" width={32} height={32} />
                 </div>
               </ButtonOrLink>
-              <div className="flex flex-col">
+              <div className="flex flex-col group-data-[collapsible=icon]:hidden">
                 <h2 className="font-headline text-lg font-semibold tracking-tight">
                   Invorg
                 </h2>
