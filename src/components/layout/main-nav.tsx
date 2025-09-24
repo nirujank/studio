@@ -45,6 +45,7 @@ export function MainNav() {
             href={item.href}
             isActive={pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))}
             tooltip={item.label}
+            className="text-primary-foreground/80 hover:bg-primary/20 hover:text-primary-foreground data-[active=true]:bg-primary/20 data-[active=true]:text-primary-foreground data-[active=true]:font-semibold"
           >
             <item.icon />
             <span>{item.label}</span>

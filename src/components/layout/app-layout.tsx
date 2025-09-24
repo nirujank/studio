@@ -18,8 +18,8 @@ import { ThemeToggle } from './theme-toggle';
 export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <Sidebar className="flex flex-col" collapsible="offcanvas">
-        <SidebarHeader className="border-b p-2">
+      <Sidebar className="flex flex-col bg-gradient-to-b from-primary to-accent" collapsible="offcanvas">
+        <SidebarHeader className="border-b border-primary/20 p-2">
           <div className="flex h-10 items-center justify-center gap-2.5">
             <ButtonOrLink>
               <div className="flex h-8 w-8 items-center justify-center rounded-lg">
@@ -27,10 +27,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </div>
             </ButtonOrLink>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-              <h2 className="font-headline text-lg font-semibold tracking-tight">
+              <h2 className="font-headline text-lg font-semibold tracking-tight text-primary-foreground">
                 Invorg
               </h2>
-              <p className="text-xs text-muted-foreground">Staff Hub</p>
+              <p className="text-xs text-primary-foreground/80">Staff Hub</p>
             </div>
           </div>
         </SidebarHeader>
@@ -41,8 +41,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           {/* Can add footer items here */}
         </SidebarFooter>
       </Sidebar>
-      <SidebarInset>
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
+      <div className="flex flex-1 flex-col">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-accent/20 bg-background/80 px-4 backdrop-blur-sm sm:px-6">
           <SidebarTrigger />
           <div className="flex-1">
             {/* Maybe add breadcrumbs or page title here */}
@@ -52,7 +52,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <UserNav />
         </header>
         <main className="flex-1 p-4 sm:p-6">{children}</main>
-      </SidebarInset>
+      </div>
     </SidebarProvider>
   );
 }

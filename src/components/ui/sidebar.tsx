@@ -23,7 +23,7 @@ const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
-const SIDEBAR_WIDTH_ICON = "3rem"
+const SIDEBAR_WIDTH_ICON = "3.5rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 type SidebarContext = {
@@ -168,7 +168,7 @@ const Sidebar = React.forwardRef<
     {
       side = "left",
       variant = "sidebar",
-      collapsible = "offcanvas",
+      collapsible = "icon",
       className,
       children,
       ...props
@@ -198,7 +198,7 @@ const Sidebar = React.forwardRef<
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+            className="w-[--sidebar-width] p-0 text-sidebar-foreground [&>button]:hidden"
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -206,7 +206,7 @@ const Sidebar = React.forwardRef<
             }
             side={side}
           >
-            <div className="flex h-full w-full flex-col">{children}</div>
+            <div className={cn("flex h-full w-full flex-col", className)}>{children}</div>
           </SheetContent>
         </Sheet>
       )
@@ -215,13 +215,16 @@ const Sidebar = React.forwardRef<
     return (
       <div
         ref={ref}
+        data-collapsible={collapsible}
+        data-state={state}
+        data-side={side}
         className={cn(
           "group text-sidebar-foreground",
           "transition-all duration-200 ease-in-out",
           state === 'expanded' ? 'w-[var(--sidebar-width)]' : 'w-[var(--sidebar-width-icon)]',
-          collapsible === 'offcanvas' && state === 'collapsed' ? 'w-0' : '',
-           side === 'left' ? 'border-r' : 'border-l',
-           variant === 'sidebar' && 'bg-sidebar',
+          collapsible === 'offcanvas' && state === 'collapsed' ? '!w-0' : '',
+           side === 'left' && variant === 'sidebar' && 'border-r',
+           side === 'right' && variant === 'sidebar' && 'border-l',
         )}
       >
         <div 
@@ -548,7 +551,7 @@ const SidebarMenuButton = React.forwardRef<
         data-active={isActive}
         className={cn(
           sidebarMenuButtonVariants({ variant, size }),
-          state === 'collapsed' && 'justify-center !p-2 !w-8 !h-8',
+          state === 'collapsed' && 'justify-center !px-2 !w-auto !h-8',
           className
         )}
         {...props}
