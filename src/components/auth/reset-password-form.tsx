@@ -14,11 +14,13 @@ import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useNotifications } from '@/hooks/use-notifications';
 
 export function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -38,6 +40,11 @@ export function ResetPasswordForm() {
       toast({
         title: 'Password Reset Requested',
         description: `The PCO has been notified to reset the password for ${email}.`,
+      });
+      addNotification({
+        title: 'Password Reset Request',
+        description: `${email} has requested a password reset.`,
+        href: `/staff`,
       });
        setEmail('');
     }, 1500);

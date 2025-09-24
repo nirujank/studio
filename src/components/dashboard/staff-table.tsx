@@ -41,6 +41,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { useNotifications } from '@/hooks/use-notifications';
 
 type StaffTableProps = {
   staffData: StaffMember[];
@@ -52,6 +53,7 @@ export function StaffTable({ staffData }: StaffTableProps) {
   const [selectedUser, setSelectedUser] = useState<StaffMember | null>(null);
   const { toast } = useToast();
   const router = useRouter();
+  const { addNotification } = useNotifications();
 
   const filteredData = staffData.filter(
     (member) =>
@@ -70,6 +72,11 @@ export function StaffTable({ staffData }: StaffTableProps) {
       toast({
         title: "Password Reset Triggered",
         description: `A password reset link has been sent to ${selectedUser.name}.`,
+      });
+      addNotification({
+        title: 'Admin Password Reset',
+        description: `Password reset initiated for ${selectedUser.name}.`,
+        href: `/staff/${selectedUser.id}/edit`,
       });
     }
     setResetDialogOpen(false);

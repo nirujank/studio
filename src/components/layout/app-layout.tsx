@@ -13,6 +13,7 @@ import { MainNav } from './main-nav';
 import { UserNav } from './user-nav';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Notifications } from './notifications';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -47,6 +48,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="flex-1">
               {/* Maybe add breadcrumbs or page title here */}
             </div>
+            <Notifications />
             <UserNav />
           </header>
           <main className="flex-1 p-4 sm:p-6">{children}</main>
