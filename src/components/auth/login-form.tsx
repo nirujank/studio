@@ -34,7 +34,7 @@ export function LoginForm() {
     <form onSubmit={handleSubmit}>
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline text-2xl">Secure Login</CardTitle>
+          <CardTitle className="font-headline text-2xl">Login</CardTitle>
           <CardDescription>
             Enter your credentials to access your account.
           </CardDescription>
@@ -68,7 +68,7 @@ export function LoginForm() {
             className="text-xs text-muted-foreground"
             asChild
           >
-            <Link href="/reset-password">Contact PCO for password reset</Link>
+            <Link href="/reset-password">Forgot your Password? Contact PCO for password reset</Link>
           </Button>
         </CardFooter>
       </Card>

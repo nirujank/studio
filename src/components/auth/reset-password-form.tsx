@@ -49,7 +49,7 @@ export function ResetPasswordForm() {
         <CardHeader>
           <CardTitle className="font-headline text-2xl">Request Reset</CardTitle>
           <CardDescription>
-            A notification will be sent to the PCO (Personnel Control Office).
+            A notification will be sent to the PCO (People and Culture Office).
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

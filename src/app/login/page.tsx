@@ -7,7 +7,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="mb-8 flex flex-col items-center">
           <div className="mb-4">
-            <Image src="/logo.png" alt="Invorg Logo" width={64} height={64} />
+            <Image src="/logo.png" alt="Invorg Logo" width={48} height={48} />
           </div>
           <h1 className="text-3xl font-bold font-headline text-foreground">
             Invorg Staff Hub

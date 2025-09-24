@@ -110,8 +110,8 @@ export function StaffTable({ staffData }: StaffTableProps) {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead className="hidden md:table-cell">Category</TableHead>
-              <TableHead className="hidden lg:table-cell">Region</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Region</TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
               </TableHead>
@@ -134,10 +134,10 @@ export function StaffTable({ staffData }: StaffTableProps) {
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="hidden md:table-cell">
+                <TableCell>
                   <Badge variant="secondary">{member.category}</Badge>
                 </TableCell>
-                <TableCell className="hidden lg:table-cell">
+                <TableCell>
                   <Badge variant="outline">{member.region}</Badge>
                 </TableCell>
                 <TableCell>
