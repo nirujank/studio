@@ -59,6 +59,7 @@ export function StaffTable({ staffData }: StaffTableProps) {
     (member) =>
       member.name.toLowerCase().includes(search.toLowerCase()) ||
       member.email.toLowerCase().includes(search.toLowerCase()) ||
+      member.tenantName.toLowerCase().includes(search.toLowerCase()) ||
       member.id.toLowerCase().includes(search.toLowerCase())
   );
   
@@ -125,6 +126,7 @@ export function StaffTable({ staffData }: StaffTableProps) {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
+              <TableHead>Tenant</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Region</TableHead>
               <TableHead>
@@ -148,6 +150,9 @@ export function StaffTable({ staffData }: StaffTableProps) {
                       </div>
                     </div>
                   </div>
+                </TableCell>
+                <TableCell>
+                  <div className="font-medium">{member.tenantName}</div>
                 </TableCell>
                 <TableCell>
                   <Badge variant="secondary">{member.category}</Badge>

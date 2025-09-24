@@ -1,6 +1,7 @@
 'use client';
 
-import type { StaffMember } from '@/lib/data';
+import type { StaffMember, Tenant } from '@/lib/data';
+import { tenantData } from '@/lib/data';
 import {
   Card,
   CardContent,
@@ -79,6 +80,19 @@ export function StaffForm({ staffMember }: StaffFormProps) {
                <CardDescription>Work-related information.</CardDescription>
             </CardHeader>
             <CardContent className="grid sm:grid-cols-2 gap-4">
+               <div className="space-y-2">
+                <Label htmlFor="tenantId">Tenant</Label>
+                 <Select name="tenantId" defaultValue={staffMember?.tenantId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select tenant" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tenantData.map((tenant: Tenant) => (
+                        <SelectItem key={tenant.id} value={tenant.id}>{tenant.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="employmentCategory">Employment Category</Label>
                  <Select name="employmentCategory" defaultValue={staffMember?.employmentCategory}>

@@ -8,6 +8,8 @@ export type StaffMember = {
   region: 'NA' | 'EMEA' | 'APAC' | 'LATAM' | 'Central' | 'Eastern';
   homeOffice: string;
   contractualOffice: string;
+  tenantId: string;
+  tenantName: string;
   profile: {
     personal: {
       phone: string;
@@ -46,6 +48,8 @@ export const staffData: StaffMember[] = [
     region: 'NA',
     homeOffice: 'San Francisco, CA',
     contractualOffice: 'San Francisco, CA',
+    tenantId: 'TEN-001',
+    tenantName: 'Innovate Corp',
     profile: {
       personal: {
         phone: '123-456-7890',
@@ -105,6 +109,8 @@ export const staffData: StaffMember[] = [
     region: 'EMEA',
     homeOffice: 'London, UK',
     contractualOffice: 'London, UK',
+    tenantId: 'TEN-002',
+    tenantName: 'Global Solutions',
     profile: {
       personal: {
         phone: '+44 20 7946 0958',
@@ -152,6 +158,8 @@ export const staffData: StaffMember[] = [
     region: 'APAC',
     homeOffice: 'Singapore',
     contractualOffice: 'Singapore',
+    tenantId: 'TEN-001',
+    tenantName: 'Innovate Corp',
     profile: {
       personal: {
         phone: '+65 9123 4567',
@@ -192,6 +200,8 @@ export const staffData: StaffMember[] = [
     region: 'NA',
     homeOffice: 'New York, NY',
     contractualOffice: 'New York, NY',
+    tenantId: 'TEN-002',
+    tenantName: 'Global Solutions',
     profile: {
       personal: {
         phone: '987-654-3210',
@@ -232,6 +242,8 @@ export const staffData: StaffMember[] = [
     region: 'EMEA',
     homeOffice: 'Berlin, DE',
     contractualOffice: 'Remote',
+    tenantId: 'TEN-003',
+    tenantName: 'Creative Minds Inc.',
     profile: {
       personal: {
         phone: '+49 30 12345678',
