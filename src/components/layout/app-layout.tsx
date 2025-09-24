@@ -14,6 +14,7 @@ import { UserNav } from './user-nav';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Notifications } from './notifications';
+import { ThemeToggle } from './theme-toggle';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -48,6 +49,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="flex-1">
               {/* Maybe add breadcrumbs or page title here */}
             </div>
+            <ThemeToggle />
             <Notifications />
             <UserNav />
           </header>
