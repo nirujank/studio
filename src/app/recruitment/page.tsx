@@ -1,20 +1,20 @@
 import { AppLayout } from '@/components/layout/app-layout';
-import { SkillsTab } from '@/components/profile/skills-tab';
-import { currentUser } from '@/lib/data';
+import { redirect } from 'next/navigation';
 
 export default function RecruitmentPage() {
-  return (
-    <AppLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold font-headline">Recruitment</h1>
-          <p className="text-muted-foreground">
-            Manage your recruitment and intake lifecycle.
-          </p>
-        </div>
-        {/* The SkillsTab contains the ResumeExtractor and skill display logic */}
-        <SkillsTab skills={[]} />
-      </div>
-    </AppLayout>
-  );
+    // Redirect to the first sub-page
+    redirect('/recruitment/requisitions');
+
+    return (
+        <AppLayout>
+            <div className="space-y-6">
+                <div>
+                <h1 className="text-3xl font-bold font-headline">Recruitment</h1>
+                <p className="text-muted-foreground">
+                    Manage your recruitment and intake lifecycle.
+                </p>
+                </div>
+            </div>
+        </AppLayout>
+    );
 }

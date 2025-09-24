@@ -2,13 +2,30 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import { LayoutDashboard, UserCircle, Users, Building2, ClipboardList, Clock, TrendingUp, PieChart, Shield } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Users,
+  Building2,
+  ClipboardList,
+  Clock,
+  TrendingUp,
+  PieChart,
+  Shield,
+  UserCircle,
+  FileText,
+  UserCheck,
+  CalendarCheck,
+} from 'lucide-react';
 import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
+import { useSidebar } from '../ui/sidebar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
 
 const navItems = [
   {
@@ -27,9 +44,26 @@ const navItems = [
     label: 'Staff',
   },
   {
-    href: '/recruitment',
-    icon: ClipboardList,
     label: 'Recruitment',
+    icon: ClipboardList,
+    href: '/recruitment',
+    subItems: [
+      {
+        href: '/recruitment/requisitions',
+        icon: FileText,
+        label: 'Requisitions',
+      },
+      {
+        href: '/recruitment/candidates',
+        icon: UserCheck,
+        label: 'Candidates',
+      },
+      {
+        href: '/recruitment/interviews',
+        icon: CalendarCheck,
+        label: 'Interviews',
+      },
+    ],
   },
   {
     href: '/time-leave',
@@ -60,20 +94,66 @@ const navItems = [
 
 export function MainNav() {
   const pathname = usePathname();
+  const { state } = useSidebar();
+
+  const isLinkActive = (href: string, isParent = false) => {
+    if (isParent) {
+      return pathname.startsWith(href);
+    }
+    return pathname === href;
+  };
 
   return (
     <SidebarMenu>
       {navItems.map((item) => (
-        <SidebarMenuItem key={item.href}>
-          <SidebarMenuButton
-            as={Link}
-            href={item.href}
-            isActive={pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))}
-            tooltip={item.label}
-          >
-            <item.icon />
-            <span>{item.label}</span>
-          </SidebarMenuButton>
+        <SidebarMenuItem key={item.href || item.label}>
+          {item.subItems ? (
+            <Collapsible>
+              <CollapsibleTrigger asChild>
+                 <SidebarMenuButton
+                  isActive={isLinkActive(item.href!, true)}
+                  tooltip={item.label}
+                  className="justify-between"
+                  as="div"
+                >
+                  <div className="flex items-center gap-2">
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </div>
+                </SidebarMenuButton>
+              </CollapsibleTrigger>
+
+              {state === 'expanded' && (
+                <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {item.subItems.map((subItem) => (
+                        <SidebarMenuSubItem key={subItem.href}>
+                          <SidebarMenuSubButton
+                            as={Link}
+                            href={subItem.href}
+                            isActive={isLinkActive(subItem.href)}
+                          >
+                            <subItem.icon />
+                            <span>{subItem.label}</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                </CollapsibleContent>
+              )}
+
+            </Collapsible>
+          ) : (
+            <SidebarMenuButton
+              as={Link}
+              href={item.href!}
+              isActive={isLinkActive(item.href!)}
+              tooltip={item.label}
+            >
+              <item.icon />
+              <span>{item.label}</span>
+            </SidebarMenuButton>
+          )}
         </SidebarMenuItem>
       ))}
     </SidebarMenu>
