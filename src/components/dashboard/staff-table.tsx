@@ -149,9 +149,9 @@ export function StaffTable({ staffData }: StaffTableProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <Link href="/profile" passHref>
-                        <DropdownMenuItem>View Profile</DropdownMenuItem>
-                      </Link>
+                      <DropdownMenuItem asChild>
+                        <Link href="/profile">View Profile</Link>
+                      </DropdownMenuItem>
                       <DropdownMenuItem>Edit</DropdownMenuItem>
                       <DropdownMenuItem onSelect={() => handleResetPassword(member)}>
                         Reset Password
