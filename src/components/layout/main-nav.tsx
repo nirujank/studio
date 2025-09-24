@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, UserCircle, Users, Building2 } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Users, Building2, ClipboardList, Clock, TrendingUp, PieChart, Shield } from 'lucide-react';
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -25,6 +25,31 @@ const navItems = [
     href: '/staff',
     icon: Users,
     label: 'Staff',
+  },
+  {
+    href: '/recruitment',
+    icon: ClipboardList,
+    label: 'Recruitment',
+  },
+  {
+    href: '/time-leave',
+    icon: Clock,
+    label: 'Time & Leave',
+  },
+  {
+    href: '/performance',
+    icon: TrendingUp,
+    label: 'Performance',
+  },
+  {
+    href: '/capacity',
+    icon: PieChart,
+    label: 'Capacity',
+  },
+  {
+    href: '/security',
+    icon: Shield,
+    label: 'Security',
   },
   {
     href: '/profile',
