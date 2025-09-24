@@ -18,7 +18,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <Sidebar
-        className="flex flex-col bg-gradient-to-b from-card to-background"
+        className="flex flex-col bg-gradient-to-b from-primary/10 to-background"
         collapsible="offcanvas"
       >
         <SidebarHeader className="border-b p-2">
