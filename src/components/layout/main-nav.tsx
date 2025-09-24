@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, UserCircle, Users } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Users, Building2 } from 'lucide-react';
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -15,6 +15,11 @@ const navItems = [
     href: '/dashboard',
     icon: LayoutDashboard,
     label: 'Dashboard',
+  },
+  {
+    href: '/tenants',
+    icon: Building2,
+    label: 'Tenants',
   },
   {
     href: '/staff',
