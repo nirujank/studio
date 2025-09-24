@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useFormStatus } from 'react';
 import {
   Card,
   CardContent,
@@ -40,7 +40,7 @@ type ResumeExtractorProps = {
 };
 
 export function ResumeExtractor({ onSkillsExtracted }: ResumeExtractorProps) {
-  const [state, formAction] = useFormState(extractSkillsAction, initialState);
+  const [state, formAction] = useActionState(extractSkillsAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
