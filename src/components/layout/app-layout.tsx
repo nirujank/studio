@@ -17,7 +17,10 @@ import { ThemeToggle } from './theme-toggle';
 export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <Sidebar className="flex flex-col bg-card" collapsible="offcanvas">
+      <Sidebar
+        className="flex flex-col bg-gradient-to-b from-card to-background"
+        collapsible="offcanvas"
+      >
         <SidebarHeader className="border-b p-2">
           <div className="flex h-10 items-center justify-center gap-2.5">
             <ButtonOrLink>
