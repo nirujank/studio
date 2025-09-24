@@ -1,3 +1,52 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "avatar1",
+      "description": "Avatar of a professional woman with glasses",
+      "imageUrl": "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx3b21hbiUyMHByb2Zlc3Npb25hbHxlbnwwfHx8fDE3NTg1ODUzNDN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman professional"
+    },
+    {
+      "id": "avatar2",
+      "description": "Avatar of a smiling man",
+      "imageUrl": "https://images.unsplash.com/photo-1639747280804-dd2d6b3d88ac?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxtYW4lMjBzbWlsaW5nfGVufDB8fHx8MTc1ODU4NDAyMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man smiling"
+    },
+    {
+      "id": "avatar3",
+      "description": "Avatar of a person working on a laptop",
+      "imageUrl": "https://images.unsplash.com/photo-1546795729-f3a5d42087f5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwZXJzb24lMjBsYXB0b3B8ZW58MHx8fHwxNzU4NTkyNjg3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person laptop"
+    },
+    {
+      "id": "avatar4",
+      "description": "Avatar of a person in a meeting",
+      "imageUrl": "https://images.unsplash.com/photo-1637979910686-ef82f715361b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBtZWV0aW5nfGVufDB8fHx8MTc1ODU5NTU2NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person meeting"
+    },
+    {
+      "id": "avatar5",
+      "description": "Avatar of a creative professional",
+      "imageUrl": "https://images.unsplash.com/photo-1532620161677-a1ca7d5d530f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjcmVhdGl2ZSUyMHByb2Zlc3Npb25hbHxlbnwwfHx8fDE3NTg1OTc2NjV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "creative professional"
+    },
+    {
+      "id": "avatar6",
+      "description": "Avatar of a developer coding",
+      "imageUrl": "https://images.unsplash.com/photo-1667984436026-99b165e3672b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxkZXZlbG9wZXIlMjBjb2Rpbmd8ZW58MHx8fHwxNzU4NTk2Nzg0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "developer coding"
+    },
+    {
+      "id": "avatar7",
+      "description": "Avatar of a woman with curly hair",
+      "imageUrl": "https://images.unsplash.com/photo-1713510068563-74ac6b4851a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx3b21hbiUyMGN1cmx5JTIwaGFpcnxlbnwwfHx8fDE3NTg2MDM0OTl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman curly hair"
+    },
+    {
+      "id": "avatar8",
+      "description": "Avatar of a man with a beard",
+      "imageUrl": "https://images.unsplash.com/photo-1672761431773-ae6e2d054493?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWFuJTIwYmVhcmR8ZW58MHx8fHwxNzU4NjAzNDM1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man beard"
+    }
+  ]
 }
