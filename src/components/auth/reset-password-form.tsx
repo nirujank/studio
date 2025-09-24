@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -12,63 +11,65 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
-export function LoginForm() {
-  const router = useRouter();
+export function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const emailRef = useRef<HTMLInputElement>(null);
+  const [email, setEmail] = useState('');
+  const { toast } = useToast();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!email) {
+      toast({
+        title: 'Email Required',
+        description: 'Please enter your email address.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsLoading(true);
-    // Simulate network request
+    // Simulate network request to admin
     setTimeout(() => {
-      router.push('/dashboard');
-    }, 1000);
+      setIsLoading(false);
+      toast({
+        title: 'Password Reset Requested',
+        description: `The PCO has been notified to reset the password for ${email}.`,
+      });
+       setEmail('');
+    }, 1500);
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline text-2xl">Secure Login</CardTitle>
+          <CardTitle className="font-headline text-2xl">Request Reset</CardTitle>
           <CardDescription>
-            Enter your credentials to access your account.
+            A notification will be sent to the PCO (Personnel Control Office).
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">Your Work Email</Label>
             <Input
               id="email"
               type="email"
               placeholder="m@example.com"
-              defaultValue="admin@invorg.com"
               required
-              ref={emailRef}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" defaultValue="password" required />
-          </div>
         </CardContent>
-        <CardFooter className="flex flex-col gap-4">
+        <CardFooter>
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Sign In
-          </Button>
-          <Button
-            type="button"
-            variant="link"
-            size="sm"
-            className="text-xs text-muted-foreground"
-            asChild
-          >
-            <Link href="/reset-password">Contact PCO for password reset</Link>
+            Request to Reset Password
           </Button>
         </CardFooter>
       </Card>
