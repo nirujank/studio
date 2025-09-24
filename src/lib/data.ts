@@ -264,4 +264,41 @@ export const staffData: StaffMember[] = [
   },
 ];
 
+export type Tenant = {
+  id: string;
+  name: string;
+  domain: string;
+  logo: string;
+  description: string;
+  status: 'Active' | 'Inactive';
+};
+
+export const tenantData: Tenant[] = [
+  {
+    id: 'TEN-001',
+    name: 'Innovate Corp',
+    domain: 'innovatecorp.com',
+    logo: 'https://picsum.photos/seed/201/100/100',
+    description: 'A forward-thinking technology company specializing in AI solutions.',
+    status: 'Active',
+  },
+  {
+    id: 'TEN-002',
+    name: 'Global Solutions',
+    domain: 'globalsolutions.io',
+    logo: 'https://picsum.photos/seed/202/100/100',
+    description: 'Connecting the world with seamless logistics and supply chain management.',
+    status: 'Active',
+  },
+  {
+    id: 'TEN-003',
+    name: 'Creative Minds Inc.',
+    domain: 'creativeminds.design',
+    logo: 'https://picsum.photos/seed/203/100/100',
+    description: 'A design agency that brings ideas to life with stunning visuals.',
+    status: 'Inactive',
+  },
+];
+
+
 export const currentUser = staffData[0];

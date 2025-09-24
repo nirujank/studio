@@ -1,8 +1,10 @@
 import { AppLayout } from '@/components/layout/app-layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { PlusCircle } from 'lucide-react';
+import { TenantGrid } from '@/components/tenants/tenant-grid';
+import { tenantData } from '@/lib/data';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 export default function TenantsPage() {
   return (
@@ -22,7 +24,11 @@ export default function TenantsPage() {
                 </Link>
             </Button>
         </div>
-        <Card>
+        
+        {tenantData.length > 0 ? (
+          <TenantGrid tenants={tenantData} />
+        ) : (
+          <Card>
             <CardHeader>
                 <CardTitle>Tenants</CardTitle>
                 <CardDescription>A list of all tenants in the system.</CardDescription>
@@ -34,6 +40,7 @@ export default function TenantsPage() {
                 </div>
             </CardContent>
         </Card>
+        )}
       </div>
     </AppLayout>
   );

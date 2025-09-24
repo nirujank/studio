@@ -2,7 +2,7 @@ import { AppLayout } from '@/components/layout/app-layout';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { TenantForm } from '@/components/tenants/tenant-form';
 
 export default function NewTenantPage() {
   return (
@@ -20,16 +20,7 @@ export default function NewTenantPage() {
             <p className="text-muted-foreground">Fill out the form to add a new tenant.</p>
           </div>
         </div>
-        <Card>
-            <CardHeader>
-                <CardTitle>Tenant Information</CardTitle>
-                <CardDescription>Enter the details for the new tenant.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                {/* Tenant form will go here */}
-                <p className="text-muted-foreground text-sm">Tenant form under construction.</p>
-            </CardContent>
-        </Card>
+        <TenantForm />
       </div>
     </AppLayout>
   );
