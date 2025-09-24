@@ -12,6 +12,7 @@ import { Building } from 'lucide-react';
 import { MainNav } from './main-nav';
 import { UserNav } from './user-nav';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -21,8 +22,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <SidebarHeader className="border-b">
             <div className="flex h-12 items-center gap-2.5 px-3">
               <ButtonOrLink>
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Building className="h-5 w-5" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg">
+                  <Image src="/logo.png" alt="Invorg Logo" width={32} height={32} />
                 </div>
               </ButtonOrLink>
               <div className="flex flex-col">
