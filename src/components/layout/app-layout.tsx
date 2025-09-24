@@ -6,7 +6,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarTrigger,
-  SidebarInset,
 } from '@/components/ui/sidebar';
 import { MainNav } from './main-nav';
 import { UserNav } from './user-nav';
@@ -42,7 +41,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </SidebarFooter>
       </Sidebar>
       <div className="flex flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-accent/20 bg-background/80 px-4 backdrop-blur-sm sm:px-6">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 sm:px-6">
           <SidebarTrigger />
           <div className="flex-1">
             {/* Maybe add breadcrumbs or page title here */}
