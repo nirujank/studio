@@ -4,7 +4,10 @@ export type StaffMember = {
   email: string;
   avatar: string;
   category: 'Engineering' | 'Design' | 'Product' | 'PCO' | 'Marketing';
-  region: 'NA' | 'EMEA' | 'APAC' | 'LATAM';
+  employmentCategory: 'Full-time' | 'Part-time' | 'Contract';
+  region: 'NA' | 'EMEA' | 'APAC' | 'LATAM' | 'Central' | 'Eastern';
+  homeOffice: string;
+  contractualOffice: string;
   profile: {
     personal: {
       phone: string;
@@ -17,8 +20,11 @@ export type StaffMember = {
       year: number;
     }[];
     skills: string[];
+    courses: string[];
     hobbies: string[];
     volunteering: string[];
+    resumeUris: string[];
+    certificateUris: string[];
   };
   jobHistory: {
     position: string;
@@ -36,7 +42,10 @@ export const staffData: StaffMember[] = [
     email: 'alex.j@invorg.com',
     avatar: 'https://picsum.photos/seed/101/200/200',
     category: 'Engineering',
+    employmentCategory: 'Full-time',
     region: 'NA',
+    homeOffice: 'San Francisco, CA',
+    contractualOffice: 'San Francisco, CA',
     profile: {
       personal: {
         phone: '123-456-7890',
@@ -56,8 +65,11 @@ export const staffData: StaffMember[] = [
         },
       ],
       skills: ['React', 'Node.js', 'TypeScript', 'GraphQL', 'AWS'],
+      courses: ['Advanced GraphQL', 'AWS Certified Developer'],
       hobbies: ['Hiking', 'Photography', 'Playing Guitar'],
       volunteering: ['Code for America', 'Local Food Bank'],
+      resumeUris: [],
+      certificateUris: [],
     },
     jobHistory: [
       {
@@ -89,7 +101,10 @@ export const staffData: StaffMember[] = [
     email: 'maria.g@invorg.com',
     avatar: 'https://picsum.photos/seed/102/200/200',
     category: 'Design',
+    employmentCategory: 'Full-time',
     region: 'EMEA',
+    homeOffice: 'London, UK',
+    contractualOffice: 'London, UK',
     profile: {
       personal: {
         phone: '+44 20 7946 0958',
@@ -104,8 +119,11 @@ export const staffData: StaffMember[] = [
         },
       ],
       skills: ['Figma', 'Sketch', 'User Research', 'Prototyping'],
+      courses: ['Advanced Figma Techniques'],
       hobbies: ['Painting', 'Yoga'],
       volunteering: ['Design for Good'],
+      resumeUris: [],
+      certificateUris: [],
     },
     jobHistory: [
       {
@@ -130,7 +148,10 @@ export const staffData: StaffMember[] = [
     email: 'chen.w@invorg.com',
     avatar: 'https://picsum.photos/seed/103/200/200',
     category: 'Product',
+    employmentCategory: 'Full-time',
     region: 'APAC',
+    homeOffice: 'Singapore',
+    contractualOffice: 'Singapore',
     profile: {
       personal: {
         phone: '+65 9123 4567',
@@ -145,8 +166,11 @@ export const staffData: StaffMember[] = [
         },
       ],
       skills: ['Product Management', 'Agile', 'Market Analysis', 'JIRA'],
+      courses: ['Certified Scrum Product Owner'],
       hobbies: ['Traveling', 'Cooking'],
       volunteering: [],
+      resumeUris: [],
+      certificateUris: [],
     },
      jobHistory: [
       {
@@ -164,7 +188,10 @@ export const staffData: StaffMember[] = [
     email: 'samira.k@invorg.com',
     avatar: 'https://picsum.photos/seed/104/200/200',
     category: 'PCO',
+    employmentCategory: 'Full-time',
     region: 'NA',
+    homeOffice: 'New York, NY',
+    contractualOffice: 'New York, NY',
     profile: {
       personal: {
         phone: '987-654-3210',
@@ -179,8 +206,11 @@ export const staffData: StaffMember[] = [
         },
       ],
       skills: ['Recruiting', 'Employee Relations', 'HR Policies', 'Talent Management'],
+      courses: ['Advanced Talent Management'],
       hobbies: ['Reading', 'Gardening'],
       volunteering: ['SHRM Foundation'],
+      resumeUris: [],
+      certificateUris: [],
     },
     jobHistory: [
       {
@@ -198,7 +228,10 @@ export const staffData: StaffMember[] = [
     email: 'ben.c@invorg.com',
     avatar: 'https://picsum.photos/seed/105/200/200',
     category: 'Engineering',
+    employmentCategory: 'Contract',
     region: 'EMEA',
+    homeOffice: 'Berlin, DE',
+    contractualOffice: 'Remote',
     profile: {
       personal: {
         phone: '+49 30 12345678',
@@ -213,8 +246,11 @@ export const staffData: StaffMember[] = [
         },
       ],
       skills: ['Python', 'Django', 'Kubernetes', 'GCP'],
+      courses: ['Google Cloud Certified Professional Cloud Architect'],
       hobbies: ['Cycling', 'Gaming'],
       volunteering: [],
+      resumeUris: [],
+      certificateUris: [],
     },
     jobHistory: [
        {
