@@ -5,7 +5,7 @@ import { extractSkillsFromResume } from '@/ai/flows/extract-skills-from-resume';
 import { extractInfoFromResume } from '@/ai/flows/extract-info-from-resume';
 import { calculateProjectFitScore } from '@/ai/flows/calculate-project-fit-score';
 import { z } from 'zod';
-import { staffData } from './lib/data';
+import { staffData } from '@/lib/data';
 
 const skillsSchema = z.object({
   resume: z.any(),
