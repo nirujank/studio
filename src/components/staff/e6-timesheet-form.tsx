@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { DatePicker } from '@/components/ui/date-picker';
+import { DatePicker } from '../ui/date-picker';
 import { projectData } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
@@ -83,7 +83,7 @@ export function E6TimesheetForm({ userId, onEntryAdded }: E6TimesheetFormProps) 
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="date">Date</Label>
-        <DatePicker name="date" />
+        <DatePicker name="date" disabled={(date) => date > new Date()} />
       </div>
       <div className="space-y-2">
         <Label htmlFor="projectId">Project Name</Label>

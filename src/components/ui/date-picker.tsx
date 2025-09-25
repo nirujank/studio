@@ -6,7 +6,7 @@ import { Calendar as CalendarIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { Calendar, type CalendarProps } from "@/components/ui/calendar"
 import {
   Popover,
   PopoverContent,
@@ -16,9 +16,10 @@ import {
 type DatePickerProps = {
     name?: string;
     defaultValue?: Date;
-}
+} & Omit<CalendarProps, 'mode' | 'selected' | 'onSelect' | 'initialFocus'>;
 
-export function DatePicker({ name, defaultValue }: DatePickerProps) {
+
+export function DatePicker({ name, defaultValue, ...props }: DatePickerProps) {
   const [date, setDate] = React.useState<Date | undefined>(defaultValue)
 
   return (
@@ -42,6 +43,7 @@ export function DatePicker({ name, defaultValue }: DatePickerProps) {
           selected={date}
           onSelect={setDate}
           initialFocus
+          {...props}
         />
       </PopoverContent>
     </Popover>
