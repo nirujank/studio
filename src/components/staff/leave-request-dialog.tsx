@@ -8,7 +8,6 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -18,11 +17,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { staffData } from '@/lib/data';
-import { useActionState, useEffect, useRef, useState } from 'react';
+import { useActionState, useEffect, useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 import { assessLeaveRequestAction, type LeaveRequestState } from '@/app/actions';
-import { Loader2, Sparkles, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, Sparkles, AlertCircle, CheckCircle, XCircle, RotateCcw } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { DatePicker } from '../ui/date-picker';
 
 type LeaveRequestDialogProps = {
   isOpen: boolean;
@@ -47,20 +47,30 @@ function SubmitButton() {
 }
 
 export function LeaveRequestDialog({ isOpen, onOpenChange }: LeaveRequestDialogProps) {
-  const [state, formAction] = useActionState(assessLeaveRequestAction, initialState);
+  const [state, formAction, isPending] = useActionState(assessLeaveRequestAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   
   useEffect(() => {
     // Reset form state when dialog is closed
     if(!isOpen) {
+        formRef.current?.reset();
         (initialState as any).data = undefined;
         (initialState as any).error = undefined;
     }
   }, [isOpen]);
 
+  const handleNewRequest = () => {
+    formRef.current?.reset();
+    (initialState as any).data = undefined;
+    (initialState as any).error = undefined;
+    // This is a bit of a trick to force a state refresh for the action state
+    // since there's no built-in reset. We can just re-trigger the form action with no data.
+    formAction(new FormData());
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>AI Leave Request Assessment</DialogTitle>
           <DialogDescription>
@@ -84,7 +94,13 @@ export function LeaveRequestDialog({ isOpen, onOpenChange }: LeaveRequestDialogP
                 <p className="text-sm text-secondary-foreground">{state.data.projectImpact}</p>
               </div>
             </div>
-             <Button onClick={() => onOpenChange(false)} variant="outline">Close</Button>
+            <div className="flex gap-2 justify-end">
+              <Button onClick={() => onOpenChange(false)} variant="ghost">Close</Button>
+              <Button onClick={handleNewRequest}>
+                <RotateCcw className="mr-2 h-4 w-4" />
+                New Request
+              </Button>
+            </div>
           </div>
         ) : (
           <form ref={formRef} action={formAction} className="space-y-4 py-4">
@@ -118,17 +134,17 @@ export function LeaveRequestDialog({ isOpen, onOpenChange }: LeaveRequestDialogP
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="leaveDays">Number of Days</Label>
-              <Input
-                id="leaveDays"
-                name="leaveDays"
-                type="number"
-                min="1"
-                placeholder="e.g., 5"
-                required
-              />
+            <div className="grid grid-cols-2 gap-4">
+                 <div className="space-y-2">
+                    <Label htmlFor="startDate">Start Date</Label>
+                    <DatePicker name="startDate" />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="endDate">End Date</Label>
+                    <DatePicker name="endDate" />
+                </div>
             </div>
+
              {state?.error && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
