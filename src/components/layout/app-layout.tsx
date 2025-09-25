@@ -13,6 +13,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Notifications } from './notifications';
 import { ThemeToggle } from './theme-toggle';
+import { Chatbot } from '../chatbot/chatbot';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -55,6 +56,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </header>
         <main className="flex-1 p-4 sm:p-6">{children}</main>
       </div>
+      <Chatbot />
     </SidebarProvider>
   );
 }

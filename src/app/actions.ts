@@ -6,6 +6,7 @@ import { extractInfoFromResume } from '@/ai/flows/extract-info-from-resume';
 import { calculateProjectFitScore } from '@/ai/flows/calculate-project-fit-score';
 import { extractProjectInfoFromBrd } from '@/ai/flows/extract-project-info-from-brd';
 import { assessLeaveRequest } from '@/ai/flows/assess-leave-request';
+import { chatbotFlow } from '@/ai/flows/chatbot-flow';
 import { z } from 'zod';
 import { staffData, projectData } from '@/lib/data';
 import { differenceInDays } from 'date-fns';
@@ -197,6 +198,7 @@ const leaveRequestSchema = z.object({
     path: ["endDate"],
 });
 
+
 export type LeaveRequestState = {
   data?: any;
   error?: string;
@@ -240,5 +242,39 @@ export async function assessLeaveRequestAction(prevState: LeaveRequestState, for
   } catch(e) {
     console.error(e);
     return { error: 'An unexpected error occurred.' };
+  }
+}
+
+const ChatbotActionSchema = z.object({
+  query: z.string(),
+  userId: z.string(),
+  userRole: z.enum(['admin', 'staff']),
+  history: z.any(),
+});
+
+export async function chatbotAction(
+  query: string,
+  userId: string,
+  userRole: 'admin' | 'staff',
+  history: any[]
+) {
+  try {
+    const validatedFields = ChatbotActionSchema.safeParse({
+      query,
+      userId,
+      userRole,
+      history,
+    });
+
+    if (!validatedFields.success) {
+      return { error: 'Invalid input for chatbot.' };
+    }
+    
+    const result = await chatbotFlow(validatedFields.data);
+
+    return { data: result };
+  } catch (e) {
+    console.error(e);
+    return { error: 'An unexpected error occurred while processing your request.' };
   }
 }

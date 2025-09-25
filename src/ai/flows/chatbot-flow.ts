@@ -1,0 +1,100 @@
+'use server';
+
+/**
+ * @fileOverview A chatbot flow that answers questions about platform data, with role-based access.
+ *
+ * - chatbotFlow - The main function that handles chatbot queries.
+ * - ChatbotInput - The input type for the chatbotFlow function.
+ * - ChatbotOutput - The return type for the chatbotFlow function.
+ */
+
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
+import { staffData, projectData, tenantData } from '@/lib/data';
+
+export const ChatbotInputSchema = z.object({
+  query: z.string().describe('The user\'s question.'),
+  userId: z.string().describe('The ID of the user asking the question.'),
+  userRole: z.enum(['admin', 'staff']).describe('The role of the user.'),
+  history: z.array(z.object({
+    role: z.enum(['user', 'model']),
+    content: z.string(),
+  })).optional().describe('The conversation history.'),
+});
+export type ChatbotInput = z.infer<typeof ChatbotInputSchema>;
+
+export const ChatbotOutputSchema = z.object({
+  response: z.string().describe('The chatbot\'s answer to the query.'),
+});
+export type ChatbotOutput = z.infer<typeof ChatbotOutputSchema>;
+
+
+const chatbotPrompt = ai.definePrompt({
+  name: 'chatbotPrompt',
+  input: {
+    schema: z.object({
+      query: z.string(),
+      userRole: z.string(),
+      context: z.string(),
+    })
+  },
+  output: { schema: ChatbotOutputSchema },
+  prompt: `You are an expert AI assistant for the Invorg Staff Hub platform. Your role is to answer questions based ONLY on the data provided in the context.
+
+Current User Role: {{userRole}}
+
+Context Data:
+{{{context}}}
+---
+
+User's Question:
+"{{query}}"
+
+Instructions:
+1.  Analyze the user's question and the provided context data.
+2.  If the user is an 'admin', you can use all the provided data to answer the question.
+3.  If the user is a 'staff' member, you MUST only answer questions about their OWN data. Do not reveal information about other staff, tenants, or projects they are not a part of. If they ask about something they don't have access to, politely refuse by saying "I'm sorry, I can only provide information about your own data." or something similar.
+4.  If the question cannot be answered with the provided context, say "I'm sorry, I don't have enough information to answer that question."
+5.  Be concise and helpful in your response.
+`,
+});
+
+
+export const chatbotFlow = ai.defineFlow(
+  {
+    name: 'chatbotFlow',
+    inputSchema: ChatbotInputSchema,
+    outputSchema: ChatbotOutputSchema,
+  },
+  async (input) => {
+    const { query, userId, userRole } = input;
+    
+    let contextData: any = {};
+
+    if (userRole === 'admin') {
+      contextData = {
+        staff: staffData,
+        projects: projectData,
+        tenants: tenantData,
+      };
+    } else {
+      const currentUser = staffData.find(s => s.id === userId);
+      if (currentUser) {
+        contextData.currentUser = currentUser;
+        contextData.myProjects = projectData.filter(p => 
+          p.resources.teamMembers.some(m => m.userId === userId)
+        );
+      }
+    }
+    
+    const contextString = JSON.stringify(contextData, null, 2);
+
+    const { output } = await chatbotPrompt({
+        query,
+        userRole,
+        context: contextString
+    });
+
+    return output!;
+  }
+);
