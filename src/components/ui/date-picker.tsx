@@ -16,11 +16,23 @@ import {
 type DatePickerProps = {
     name?: string;
     defaultValue?: Date;
+    onDateSelect?: (date: Date | undefined) => void;
 } & Omit<CalendarProps, 'mode' | 'selected' | 'onSelect' | 'initialFocus'>;
 
 
-export function DatePicker({ name, defaultValue, ...props }: DatePickerProps) {
+export function DatePicker({ name, defaultValue, onDateSelect, ...props }: DatePickerProps) {
   const [date, setDate] = React.useState<Date | undefined>(defaultValue)
+
+  const handleSelect = (selectedDate: Date | undefined) => {
+    setDate(selectedDate);
+    if(onDateSelect) {
+      onDateSelect(selectedDate);
+    }
+  }
+  
+  React.useEffect(() => {
+    setDate(defaultValue);
+  }, [defaultValue]);
 
   return (
     <Popover>
@@ -41,7 +53,7 @@ export function DatePicker({ name, defaultValue, ...props }: DatePickerProps) {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={setDate}
+          onSelect={handleSelect}
           initialFocus
           {...props}
         />

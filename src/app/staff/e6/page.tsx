@@ -8,11 +8,13 @@ import { useState, useEffect, useMemo } from 'react';
 import { format, startOfWeek, endOfWeek, isWithinInterval, startOfMonth, endOfMonth, isSameDay } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CalendarIcon, PlusCircle } from 'lucide-react';
+import { CalendarIcon, PlusCircle, Pencil, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
 
 export type TimesheetEntry = {
   id: string;
@@ -65,9 +67,12 @@ export default function E6Page() {
   const [userId, setUserId] = useState<string | null>(null);
   const [entries, setEntries] = useState<TimesheetEntry[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingEntry, setEditingEntry] = useState<TimesheetEntry | null>(null);
+  const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>('week');
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const { toast } = useToast();
 
 
   useEffect(() => {
@@ -84,11 +89,37 @@ export default function E6Page() {
     }
   }, []);
 
-  const handleEntryAdded = (newEntry: Omit<TimesheetEntry, 'id'>) => {
-    setEntries(prev => [...prev, { ...newEntry, id: Date.now().toString() }].sort((a, b) => b.date.getTime() - a.date.getTime()));
-    setIsDialogOpen(false);
+  const handleOpenDialog = (entry: TimesheetEntry | null = null) => {
+    setEditingEntry(entry);
+    setIsDialogOpen(true);
   };
   
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setEditingEntry(null);
+  };
+
+  const handleEntrySubmit = (newEntryData: Omit<TimesheetEntry, 'id'>) => {
+    if (editingEntry) {
+        // Update existing entry
+        setEntries(prev => prev.map(e => e.id === editingEntry.id ? { ...e, ...newEntryData } : e));
+        toast({ title: "Entry Updated", description: "Your timesheet entry has been updated." });
+    } else {
+        // Add new entry
+        setEntries(prev => [...prev, { ...newEntryData, id: Date.now().toString() }].sort((a, b) => b.date.getTime() - a.date.getTime()));
+        toast({ title: "Entry Added", description: `Logged ${newEntryData.hours} hours.` });
+    }
+    handleCloseDialog();
+  };
+  
+  const handleDeleteEntry = () => {
+    if (deletingEntryId) {
+      setEntries(prev => prev.filter(e => e.id !== deletingEntryId));
+      toast({ title: "Entry Deleted", description: "The timesheet entry has been removed." });
+      setDeletingEntryId(null);
+    }
+  };
+
   const displayedEntries = useMemo(() => {
     let interval: { start: Date; end: Date };
 
@@ -112,8 +143,6 @@ export default function E6Page() {
   const totalHours = useMemo(() => {
     return displayedEntries.reduce((acc, entry) => acc + entry.hours, 0);
   }, [displayedEntries]);
-  
-  const entryDates = useMemo(() => entries.map(e => e.date), [entries]);
 
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
@@ -143,17 +172,21 @@ export default function E6Page() {
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button>
+                <Button onClick={() => handleOpenDialog()}>
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Log Time
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Log Time</DialogTitle>
+                  <DialogTitle>{editingEntry ? 'Edit' : 'Log'} Time</DialogTitle>
                   <DialogDescription>Enter your work details for a specific day.</DialogDescription>
                 </DialogHeader>
-                <E6TimesheetForm userId={userId} onEntryAdded={handleEntryAdded} />
+                <E6TimesheetForm 
+                  userId={userId} 
+                  onEntrySubmit={handleEntrySubmit} 
+                  entry={editingEntry}
+                />
               </DialogContent>
             </Dialog>
         </div>
@@ -207,6 +240,7 @@ export default function E6Page() {
                     <TableHead>Project</TableHead>
                     <TableHead>Hours</TableHead>
                     <TableHead>Pay Type</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -221,12 +255,22 @@ export default function E6Page() {
                         <TableCell>
                             <Badge variant={entry.payType === 'Overtime' ? 'destructive' : 'secondary'}>{entry.payType}</Badge>
                         </TableCell>
+                        <TableCell className="text-right">
+                            <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(entry)}>
+                              <Pencil className="h-4 w-4" />
+                              <span className="sr-only">Edit</span>
+                            </Button>
+                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => setDeletingEntryId(entry.id)}>
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Delete</span>
+                            </Button>
+                        </TableCell>
                         </TableRow>
                     )
                     })
                 ) : (
                     <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground">
+                    <TableCell colSpan={5} className="text-center text-muted-foreground">
                         No entries for this period.
                     </TableCell>
                     </TableRow>
@@ -236,6 +280,21 @@ export default function E6Page() {
             </CardContent>
         </Card>
       </div>
+
+       <AlertDialog open={!!deletingEntryId} onOpenChange={() => setDeletingEntryId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your timesheet entry.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeletingEntryId(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteEntry} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppLayout>
   );
 }
