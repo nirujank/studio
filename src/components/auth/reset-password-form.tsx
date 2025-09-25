@@ -15,12 +15,14 @@ import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNotifications } from '@/hooks/use-notifications';
+import { useRouter } from 'next/navigation';
 
 export function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
   const { toast } = useToast();
   const { addNotification } = useNotifications();
+  const router = useRouter();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,14 +41,14 @@ export function ResetPasswordForm() {
       setIsLoading(false);
       toast({
         title: 'Password Reset Requested',
-        description: `The PCO has been notified to reset the password for ${email}.`,
+        description: `If an account exists for ${email}, a reset link has been sent.`,
       });
       addNotification({
         title: 'Password Reset Request',
         description: `${email} has requested a password reset.`,
         href: `/staff`,
       });
-       setEmail('');
+      router.push('/login');
     }, 1500);
   };
 
@@ -56,7 +58,7 @@ export function ResetPasswordForm() {
         <CardHeader>
           <CardTitle className="font-headline text-2xl">Request Reset</CardTitle>
           <CardDescription>
-            A notification will be sent to the PCO (People and Culture Office).
+            A password reset link will be sent to your email address.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -76,7 +78,7 @@ export function ResetPasswordForm() {
         <CardFooter>
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Request to Reset Password
+            Send Reset Link
           </Button>
         </CardFooter>
       </Card>

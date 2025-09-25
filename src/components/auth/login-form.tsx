@@ -12,39 +12,42 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { staffData } from '@/lib/data';
+import { useToast } from '@/hooks/use-toast';
 
 export function LoginForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedUser, setSelectedUser] = useState('admin');
+  const [email, setEmail] = useState('');
+  const { toast } = useToast();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
 
-    // Simulate storing the user role
-    if (typeof window !== 'undefined') {
-        sessionStorage.setItem('userRole', selectedUser === 'admin' ? 'admin' : 'staff');
-        sessionStorage.setItem('userId', selectedUser);
-    }
-    
-    // Simulate network request
+    // Simulate finding the user
+    const isAdmin = email.toLowerCase() === 'admin@invorg.com';
+    const user = staffData.find(s => s.email.toLowerCase() === email.toLowerCase());
+
     setTimeout(() => {
-      if (selectedUser === 'admin') {
+      if (isAdmin) {
+        sessionStorage.setItem('userRole', 'admin');
+        sessionStorage.setItem('userId', 'admin-user-id'); // A placeholder admin ID
         router.push('/dashboard');
+      } else if (user) {
+        sessionStorage.setItem('userRole', 'staff');
+        sessionStorage.setItem('userId', user.id);
+        router.push(`/staff/${user.id}`);
       } else {
-        router.push(`/staff/${selectedUser}`);
+        toast({
+            variant: 'destructive',
+            title: 'Login Failed',
+            description: 'No user found with that email address.',
+        });
+        setIsLoading(false);
       }
     }, 1000);
   };
@@ -55,25 +58,13 @@ export function LoginForm() {
         <CardHeader>
           <CardTitle className="font-headline text-2xl">Login</CardTitle>
           <CardDescription>
-            Select a user to log in.
+            Enter your credentials to access your account.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="user-select">Log in as</Label>
-            <Select value={selectedUser} onValueChange={setSelectedUser}>
-              <SelectTrigger id="user-select">
-                <SelectValue placeholder="Select a user" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="admin">Admin User</SelectItem>
-                {staffData.map(staff => (
-                  <SelectItem key={staff.id} value={staff.id}>
-                    {staff.name} (Staff)
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="email" placeholder="m@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
@@ -92,7 +83,7 @@ export function LoginForm() {
             className="text-xs text-muted-foreground"
             asChild
           >
-            <Link href="/login">Forgot your Password? Contact PCO for password reset</Link>
+            <Link href="/reset-password">Forgot your password?</Link>
           </Button>
         </CardFooter>
       </Card>
