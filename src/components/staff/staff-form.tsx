@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ResumeUploader } from './resume-uploader';
 
 type StaffFormProps = {
@@ -65,9 +65,9 @@ export function StaffForm({ staffMember }: StaffFormProps) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectChange = (name: string, value: string) => {
+  const handleSelectChange = useCallback((name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
