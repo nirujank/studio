@@ -33,7 +33,7 @@ import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
 
 type ProjectFormProps = {
-  project?: Project | Partial<Project>;
+  project?: Project | Partial<Project> | null;
 };
 
 type Resource = {
@@ -53,11 +53,11 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
   const [formData, setFormData] = useState({
     name: project?.name || '',
-    code: project?.code || '',
-    version: project?.version || '',
+    code: (project && 'code' in project) ? project.code : '',
+    version: (project && 'version' in project) ? project.version : '',
     owner: project?.owner || '',
     manager: project?.manager || '',
-    tenantId: 'tenantId' in project ? project.tenantId : '',
+    tenantId: (project && 'tenantId' in project) ? project.tenantId : '',
   });
 
   const [techStack, setTechStack] = useState({
@@ -90,11 +90,11 @@ export function ProjectForm({ project }: ProjectFormProps) {
     if (project) {
         setFormData({
             name: project.name || '',
-            code: 'code' in project ? project.code : '',
-            version: 'version' in project ? project.version : '',
+            code: 'code' in project ? project.code || '' : '',
+            version: 'version' in project ? project.version || '' : '',
             owner: project.owner || '',
             manager: project.manager || '',
-            tenantId: 'tenantId' in project ? project.tenantId : '',
+            tenantId: 'tenantId' in project ? project.tenantId || '' : '',
         });
         setTechStack({
             languages: project.techStack?.languages?.join(', ') || '',
@@ -108,6 +108,12 @@ export function ProjectForm({ project }: ProjectFormProps) {
             startDate: project.timeline?.startDate ? new Date(project.timeline.startDate) : undefined,
             endDate: project.timeline?.endDate ? new Date(project.timeline.endDate) : undefined,
         });
+        setResources(project.resources?.teamMembers?.map(tm => ({
+          id: tm.userId + Date.now(),
+          userId: tm.userId,
+          role: tm.role,
+          allocation: tm.allocation,
+        })) || [])
     }
   }, [project]);
 
@@ -452,15 +458,15 @@ export function ProjectForm({ project }: ProjectFormProps) {
             <CardContent className="grid sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="bugTrackerUrl">Bug Tracking Tool URL</Label>
-                <Input id="bugTrackerUrl" name="bugTrackerUrl" placeholder="https://jira.example.com" defaultValue={'support' in project ? project.support?.bugTrackerUrl : ''} />
+                <Input id="bugTrackerUrl" name="bugTrackerUrl" placeholder="https://jira.example.com" defaultValue={(project && 'support' in project) ? project.support?.bugTrackerUrl : ''} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="sla">Support SLA</Label>
-                <Input id="sla" name="sla" placeholder="e.g., 24-hour response" defaultValue={'support' in project ? project.support?.sla : ''} />
+                <Input id="sla" name="sla" placeholder="e.g., 24-hour response" defaultValue={(project && 'support' in project) ? project.support?.sla : ''} />
               </div>
                <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="escalationContacts">Escalation Contacts</Label>
-                <Input id="escalationContacts" name="escalationContacts" placeholder="e.g., Manager Name, Lead Engineer Name" defaultValue={'support' in project ? project.support?.escalationContacts.join(', ') : ''} />
+                <Input id="escalationContacts" name="escalationContacts" placeholder="e.g., Manager Name, Lead Engineer Name" defaultValue={(project && 'support' in project) ? project.support?.escalationContacts.join(', ') : ''} />
               </div>
             </CardContent>
           </Card>
@@ -472,15 +478,15 @@ export function ProjectForm({ project }: ProjectFormProps) {
             <CardContent className="grid sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="architectureUrl">Architecture Docs URL</Label>
-                <Input id="architectureUrl" name="architectureUrl" defaultValue={'documentation' in project ? project.documentation?.architectureUrl : ''}/>
+                <Input id="architectureUrl" name="architectureUrl" defaultValue={(project && 'documentation' in project) ? project.documentation?.architectureUrl : ''}/>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="apiUrl">API Docs URL</Label>
-                <Input id="apiUrl" name="apiUrl" defaultValue={'documentation' in project ? project.documentation?.apiUrl : ''} />
+                <Input id="apiUrl" name="apiUrl" defaultValue={(project && 'documentation' in project) ? project.documentation?.apiUrl : ''} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="wikiUrl">Knowledge Base / Wiki URL</Label>
-                <Input id="wikiUrl" name="wikiUrl" defaultValue={'documentation' in project ? project.documentation?.wikiUrl : ''}/>
+                <Input id="wikiUrl" name="wikiUrl" defaultValue={(project && 'documentation' in project) ? project.documentation?.wikiUrl : ''}/>
               </div>
             </CardContent>
           </Card>
@@ -492,7 +498,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
             <CardContent className="grid gap-6">
                 <div className="space-y-2">
                     <Label htmlFor="risks">Key Risks & Mitigation</Label>
-                    <Textarea id="risks" name="risks" placeholder="Describe key risks and their mitigation plans." defaultValue={'risks' in project ? project.risks?.map(r => r.description).join('\n') : ''} />
+                    <Textarea id="risks" name="risks" placeholder="Describe key risks and their mitigation plans." defaultValue={(project && 'risks' in project) ? project.risks?.map(r => r.description).join('\n') : ''} />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="dependencies">Dependencies</Label>
