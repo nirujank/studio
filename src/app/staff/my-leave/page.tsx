@@ -9,15 +9,16 @@ import { useState, useEffect } from 'react';
 
 export default function MyLeavePage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState<(typeof staffData)[0] | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const userId = sessionStorage.getItem('userId');
-      const user = staffData.find(s => s.id === userId);
-      setCurrentUser(user || null);
+      setCurrentUserId(userId);
     }
   }, []);
+  
+  const currentUser = staffData.find(s => s.id === currentUserId);
 
   return (
     <AppLayout>
@@ -73,7 +74,7 @@ export default function MyLeavePage() {
             </Card>
         )}
       </div>
-      {currentUser && <LeaveRequestDialog isOpen={isDialogOpen} onOpenChange={setIsDialogOpen} staffId={currentUser.id} />}
+      {currentUserId && <LeaveRequestDialog isOpen={isDialogOpen} onOpenChange={setIsDialogOpen} staffId={currentUserId} />}
     </AppLayout>
   );
 }

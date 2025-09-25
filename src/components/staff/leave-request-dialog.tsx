@@ -1,4 +1,3 @@
-
 'use client';
 import {
   Dialog,
@@ -55,19 +54,20 @@ export function LeaveRequestDialog({ isOpen, onOpenChange, staffId }: LeaveReque
 
   const handleNewRequest = () => {
     startResetTransition(() => {
-        const formData = new FormData();
-        formData.append('reset', 'true');
-        formAction(formData);
+      const formData = new FormData();
+      formData.append('reset', 'true');
+      formAction(formData);
     });
     formRef.current?.reset();
   };
   
   useEffect(() => {
-    // Reset form state when dialog is closed
-    if(!isOpen && (state?.data || state?.error)) {
-        handleNewRequest();
+    // Reset form state when dialog is closed but not if it's just opening
+    if (!isOpen && (state?.data || state?.error)) {
+        // Use a timeout to avoid updating state while the component is unmounting
+        setTimeout(handleNewRequest, 100);
     }
-  }, [isOpen, state?.data, state?.error]);
+  }, [isOpen]);
 
 
   return (
@@ -106,22 +106,26 @@ export function LeaveRequestDialog({ isOpen, onOpenChange, staffId }: LeaveReque
           </div>
         ) : (
           <form ref={formRef} action={formAction} className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="staffId">Staff Member</Label>
-              <Select name="staffId" required defaultValue={staffId} disabled={!!staffId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a staff member" />
-                </SelectTrigger>
-                <SelectContent>
-                  {staffData.map((staff) => (
-                    <SelectItem key={staff.id} value={staff.id}>
-                      {staff.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
+            {staffId ? (
+                <input type="hidden" name="staffId" value={staffId} />
+            ) : (
+                <div className="space-y-2">
+                <Label htmlFor="staffId">Staff Member</Label>
+                <Select name="staffId" required>
+                    <SelectTrigger>
+                    <SelectValue placeholder="Select a staff member" />
+                    </SelectTrigger>
+                    <SelectContent>
+                    {staffData.map((staff) => (
+                        <SelectItem key={staff.id} value={staff.id}>
+                        {staff.name}
+                        </SelectItem>
+                    ))}
+                    </SelectContent>
+                </Select>
+                </div>
+            )}
+            
             <div className="space-y-2">
               <Label htmlFor="leaveType">Leave Type</Label>
               <Select name="leaveType" required>
