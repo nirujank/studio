@@ -203,6 +203,10 @@ export type LeaveRequestState = {
 }
 
 export async function assessLeaveRequestAction(prevState: LeaveRequestState, formData: FormData) : Promise<LeaveRequestState> {
+  if (formData.get('reset')) {
+    return { data: null, error: null };
+  }
+  
   try {
     const validatedFields = leaveRequestSchema.safeParse({
       staffId: formData.get('staffId'),

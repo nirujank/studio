@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Dialog,
@@ -17,7 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { staffData } from '@/lib/data';
-import { useActionState, useEffect, useRef, useState } from 'react';
+import { useActionState, useEffect, useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 import { assessLeaveRequestAction, type LeaveRequestState } from '@/app/actions';
 import { Loader2, Sparkles, AlertCircle, CheckCircle, XCircle, RotateCcw } from 'lucide-react';
@@ -49,22 +50,19 @@ function SubmitButton() {
 export function LeaveRequestDialog({ isOpen, onOpenChange }: LeaveRequestDialogProps) {
   const [state, formAction, isPending] = useActionState(assessLeaveRequestAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
-  // Separate state to manage form reset
-  const [formKey, setFormKey] = useState(Date.now());
   
   useEffect(() => {
     // Reset form state when dialog is closed
-    if(!isOpen) {
+    if(!isOpen && (state?.data || state?.error)) {
         handleNewRequest();
     }
-  }, [isOpen]);
+  }, [isOpen, state]);
 
   const handleNewRequest = () => {
-    // By changing the key of the form, we force it to re-mount and reset.
-    setFormKey(Date.now()); 
-    // Also clear any previous action state manually if needed
-    if(initialState.data) delete initialState.data;
-    if(initialState.error) delete initialState.error;
+    const formData = new FormData();
+    formData.append('reset', 'true');
+    formAction(formData);
+    formRef.current?.reset();
   };
 
   return (
@@ -102,7 +100,7 @@ export function LeaveRequestDialog({ isOpen, onOpenChange }: LeaveRequestDialogP
             </DialogFooter>
           </div>
         ) : (
-          <form key={formKey} ref={formRef} action={formAction} className="space-y-4 py-4">
+          <form ref={formRef} action={formAction} className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="staffId">Staff Member</Label>
               <Select name="staffId" required>
