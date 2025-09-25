@@ -5,6 +5,7 @@ import { extractSkillsFromResume } from '@/ai/flows/extract-skills-from-resume';
 import { extractInfoFromResume } from '@/ai/flows/extract-info-from-resume';
 import { calculateProjectFitScore } from '@/ai/flows/calculate-project-fit-score';
 import { extractProjectInfoFromBrd } from '@/ai/flows/extract-project-info-from-brd';
+import { assessLeaveRequest } from '@/ai/flows/assess-leave-request';
 import { z } from 'zod';
 import { staffData } from '@/lib/data';
 
@@ -182,5 +183,44 @@ export async function extractProjectInfoAction(
   } catch (e) {
     console.error(e);
     return { error: 'An unexpected error occurred. Please try again.' };
+  }
+}
+
+const leaveRequestSchema = z.object({
+  staffId: z.string(),
+  leaveType: z.enum(['sick', 'vacation', 'personal']),
+  leaveDays: z.coerce.number().positive(),
+});
+
+export type LeaveRequestState = {
+  data?: any;
+  error?: string;
+}
+
+export async function assessLeaveRequestAction(prevState: LeaveRequestState, formData: FormData) : Promise<LeaveRequestState> {
+  try {
+    const validatedFields = leaveRequestSchema.safeParse({
+      staffId: formData.get('staffId'),
+      leaveType: formData.get('leaveType'),
+      leaveDays: formData.get('leaveDays'),
+    });
+    
+    if (!validatedFields.success) {
+      return { error: 'Invalid leave request data.' };
+    }
+
+    const { staffId, leaveType, leaveDays } = validatedFields.data;
+
+    const result = await assessLeaveRequest({ staffId, leaveType, leaveDays });
+
+    if (result) {
+      return { data: result };
+    } else {
+      return { error: "Couldn't assess the leave request." };
+    }
+
+  } catch(e) {
+    console.error(e);
+    return { error: 'An unexpected error occurred.' };
   }
 }

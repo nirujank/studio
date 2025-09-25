@@ -1,3 +1,4 @@
+'use client';
 import { AppLayout } from '@/components/layout/app-layout';
 import { staffData } from '@/lib/data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,8 +6,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { LeaveRequestDialog } from '@/components/staff/leave-request-dialog';
+import { useState } from 'react';
 
 export default function LeavePage() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -17,7 +22,7 @@ export default function LeavePage() {
                     Monitor and manage staff leave balances.
                 </p>
             </div>
-             <Button>
+             <Button onClick={() => setIsDialogOpen(true)}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Add Leave Request
             </Button>
@@ -74,6 +79,7 @@ export default function LeavePage() {
             </CardContent>
         </Card>
       </div>
+      <LeaveRequestDialog isOpen={isDialogOpen} onOpenChange={setIsDialogOpen} />
     </AppLayout>
   );
 }
