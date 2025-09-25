@@ -45,6 +45,11 @@ const navItems = [
     label: 'Staff',
   },
   {
+    href: '/projects',
+    icon: FolderKanban,
+    label: 'Projects',
+  },
+  {
     label: 'Recruitment',
     icon: ClipboardList,
     href: '/recruitment',
@@ -85,11 +90,6 @@ const navItems = [
     href: '/security',
     icon: Shield,
     label: 'Security',
-  },
-  {
-    href: '/projects',
-    icon: FolderKanban,
-    label: 'Projects',
   },
   {
     href: '/profile',
