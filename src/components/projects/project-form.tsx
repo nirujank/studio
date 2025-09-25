@@ -1,7 +1,7 @@
 'use client';
 
-import type { Project, Tenant } from '@/lib/data';
-import { tenantData } from '@/lib/data';
+import type { Project, Tenant, StaffMember } from '@/lib/data';
+import { tenantData, staffData } from '@/lib/data';
 import {
   Card,
   CardContent,
@@ -22,18 +22,57 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { Save } from 'lucide-react';
+import { Save, PlusCircle, Trash2 } from 'lucide-react';
 import { Textarea } from '../ui/textarea';
 import { DatePicker } from '../ui/date-picker';
+import React, { useState } from 'react';
 
 type ProjectFormProps = {
   project?: Project;
+};
+
+type Resource = {
+  id: string;
+  userId: string;
+  role: string;
+  allocation: number;
 };
 
 export function ProjectForm({ project }: ProjectFormProps) {
   const { toast } = useToast();
   const router = useRouter();
   const isEditMode = !!project;
+
+  const initialResources =
+    project?.resources.teamMembers.map((tm) => ({
+      id: tm.userId + Date.now(), // simple unique id
+      userId: tm.userId,
+      role: tm.role,
+      allocation: tm.allocation,
+    })) || [];
+
+  const [resources, setResources] = useState<Resource[]>(initialResources);
+
+  const handleAddResource = () => {
+    setResources([
+      ...resources,
+      { id: `new-${Date.now()}`, userId: '', role: '', allocation: 100 },
+    ]);
+  };
+
+  const handleRemoveResource = (id: string) => {
+    setResources(resources.filter((r) => r.id !== id));
+  };
+
+  const handleResourceChange = (
+    id: string,
+    field: keyof Resource,
+    value: string | number
+  ) => {
+    setResources(
+      resources.map((r) => (r.id === id ? { ...r, [field]: value } : r))
+    );
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -113,15 +152,73 @@ export function ProjectForm({ project }: ProjectFormProps) {
           </Card>
 
            <Card>
-            <CardHeader>
-              <CardTitle>Resources & Roles</CardTitle>
-              <CardDescription>Manage team members and their allocation.</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Resources & Roles</CardTitle>
+                <CardDescription>Manage team members and their allocation.</CardDescription>
+              </div>
+               <Button type="button" variant="outline" size="sm" onClick={handleAddResource}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add Member
+              </Button>
             </CardHeader>
-            <CardContent>
-                <div className="space-y-2">
-                    <Label htmlFor="resources">Team Members & Allocation</Label>
-                    <Textarea id="resources" name="resources" placeholder="e.g., Alex Johnson (Developer, 100%), Maria Garcia (Designer, 50%)" />
+            <CardContent className="space-y-4">
+              {resources.map((resource) => (
+                <div key={resource.id} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center">
+                  <div className="md:col-span-5 space-y-1">
+                     <Label htmlFor={`resource-user-${resource.id}`} className="text-xs">Staff Member</Label>
+                    <Select
+                      name={`resource_user_${resource.id}`}
+                      value={resource.userId}
+                      onValueChange={(value) => handleResourceChange(resource.id, 'userId', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select staff member" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {staffData.map((staff: StaffMember) => (
+                          <SelectItem key={staff.id} value={staff.id}>
+                            {staff.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                   <div className="md:col-span-4 space-y-1">
+                     <Label htmlFor={`resource-role-${resource.id}`} className="text-xs">Role</Label>
+                    <Input
+                      id={`resource-role-${resource.id}`}
+                      name={`resource_role_${resource.id}`}
+                      placeholder="e.g., Lead Developer"
+                      value={resource.role}
+                      onChange={(e) => handleResourceChange(resource.id, 'role', e.target.value)}
+                    />
+                  </div>
+                  <div className="md:col-span-2 space-y-1">
+                     <Label htmlFor={`resource-alloc-${resource.id}`} className="text-xs">Allocation %</Label>
+                    <Input
+                      id={`resource-alloc-${resource.id}`}
+                      name={`resource_alloc_${resource.id}`}
+                      type="number"
+                      placeholder="100"
+                       value={resource.allocation}
+                      onChange={(e) => handleResourceChange(resource.id, 'allocation', parseInt(e.target.value) || 0)}
+                    />
+                  </div>
+                  <div className="md:col-span-1 flex items-end justify-end h-full">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive"
+                      onClick={() => handleRemoveResource(resource.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
+              ))}
+               {resources.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No team members added.</p>}
             </CardContent>
           </Card>
 
