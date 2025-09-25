@@ -12,7 +12,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { staffData, projectData, tenantData } from '@/lib/data';
 
-export const ChatbotInputSchema = z.object({
+const ChatbotInputSchema = z.object({
   query: z.string().describe('The user\'s question.'),
   userId: z.string().describe('The ID of the user asking the question.'),
   userRole: z.enum(['admin', 'staff']).describe('The role of the user.'),
@@ -23,7 +23,7 @@ export const ChatbotInputSchema = z.object({
 });
 export type ChatbotInput = z.infer<typeof ChatbotInputSchema>;
 
-export const ChatbotOutputSchema = z.object({
+const ChatbotOutputSchema = z.object({
   response: z.string().describe('The chatbot\'s answer to the query.'),
 });
 export type ChatbotOutput = z.infer<typeof ChatbotOutputSchema>;

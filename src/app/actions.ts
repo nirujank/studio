@@ -6,7 +6,7 @@ import { extractInfoFromResume } from '@/ai/flows/extract-info-from-resume';
 import { calculateProjectFitScore } from '@/ai/flows/calculate-project-fit-score';
 import { extractProjectInfoFromBrd } from '@/ai/flows/extract-project-info-from-brd';
 import { assessLeaveRequest } from '@/ai/flows/assess-leave-request';
-import { runChatbotFlow } from '@/ai/flows/chatbot-flow';
+import { runChatbotFlow, type ChatbotInput } from '@/ai/flows/chatbot-flow';
 import { z } from 'zod';
 import { staffData, projectData } from '@/lib/data';
 import { differenceInDays } from 'date-fns';
@@ -270,7 +270,7 @@ export async function chatbotAction(
       return { error: 'Invalid input for chatbot.' };
     }
     
-    const result = await runChatbotFlow(validatedFields.data);
+    const result = await runChatbotFlow(validatedFields.data as ChatbotInput);
 
     return { data: result };
   } catch (e) {
