@@ -83,12 +83,12 @@ export function StaffForm({ staffMember }: StaffFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          {!isEditMode && (
-            <ResumeUploader onInfoExtracted={handleInfoExtracted} />
-          )}
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-2 space-y-6">
+        {!isEditMode && (
+          <ResumeUploader onInfoExtracted={handleInfoExtracted} />
+        )}
+        <form onSubmit={handleSubmit} className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Personal Information</CardTitle>
@@ -187,41 +187,42 @@ export function StaffForm({ staffMember }: StaffFormProps) {
               </div>
             </CardContent>
           </Card>
-        </div>
-        <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Profile Media</CardTitle>
-                <CardDescription>Upload necessary documents and a profile picture.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="profile-picture">Profile Picture</Label>
-                  <Input id="profile-picture" type="file" accept="image/*" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="resumes">Resumes</Label>
-                  <Input id="resumes" type="file" multiple />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="certificates">Certificates</Label>
-                  <Input id="certificates" type="file" multiple />
-                </div>
-              </CardContent>
-            </Card>
-             <Card>
-                <CardHeader>
-                    <CardTitle>Actions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Button type="submit" className="w-full">
-                        {isEditMode ? 'Save Changes' : 'Add Staff Member'}
-                    </Button>
-                </CardContent>
-            </Card>
-        </div>
+
+          {/* This button submits the form that wraps the cards above */}
+          <Card>
+            <CardHeader>
+                <CardTitle>Actions</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Button type="submit" className="w-full">
+                    {isEditMode ? 'Save Changes' : 'Add Staff Member'}
+                </Button>
+            </CardContent>
+          </Card>
+        </form>
       </div>
-       {/* Placeholder for other sections like Education, Job History, Skills, etc. */}
-    </form>
+      <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Profile Media</CardTitle>
+              <CardDescription>Upload necessary documents and a profile picture.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="profile-picture">Profile Picture</Label>
+                <Input id="profile-picture" type="file" accept="image/*" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="resumes">Resumes</Label>
+                <Input id="resumes" type="file" multiple />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="certificates">Certificates</Label>
+                <Input id="certificates" type="file" multiple />
+              </div>
+            </CardContent>
+          </Card>
+      </div>
+    </div>
   );
 }
