@@ -3,7 +3,9 @@
 
 import { extractSkillsFromResume } from '@/ai/flows/extract-skills-from-resume';
 import { extractInfoFromResume } from '@/ai/flows/extract-info-from-resume';
+import { calculateProjectFitScore } from '@/ai/flows/calculate-project-fit-score';
 import { z } from 'zod';
+import { staffData } from './lib/data';
 
 const skillsSchema = z.object({
   resume: z.any(),
@@ -96,6 +98,42 @@ export async function extractInfoAction(
   } catch (e) {
     console.error(e);
     return { error: 'An unexpected error occurred. Please try again.' };
+  }
+}
+
+const fitScoreSchema = z.object({
+  userId: z.string(),
+  projectTechStack: z.array(z.string()),
+});
+
+export async function getFitScoreAction(
+  userId: string,
+  projectTechStack: string[]
+) {
+   try {
+    const validatedFields = fitScoreSchema.safeParse({
+      userId,
+      projectTechStack,
+    });
+
+    if (!validatedFields.success) {
+      return { error: 'Invalid input for fit score.' };
+    }
+
+    const staffMember = staffData.find(s => s.id === userId);
+    if (!staffMember) {
+      return { error: 'Staff member not found.' };
+    }
+    
+    const result = await calculateProjectFitScore({
+      projectTechStack,
+      staffSkills: staffMember.profile.skills || [],
+    });
+
+    return { data: result };
+  } catch (e) {
+    console.error(e);
+    return { error: 'An unexpected error occurred while calculating the fit score.' };
   }
 }
 

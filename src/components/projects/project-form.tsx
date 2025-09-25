@@ -22,10 +22,15 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { Save, PlusCircle, Trash2 } from 'lucide-react';
+import { Save, PlusCircle, Trash2, Sparkles, Loader2, Info } from 'lucide-react';
 import { Textarea } from '../ui/textarea';
 import { DatePicker } from '../ui/date-picker';
-import React, { useState } from 'react';
+import React, { useState, useTransition } from 'react';
+import { getFitScoreAction } from '@/app/actions';
+import type { CalculateProjectFitScoreOutput } from '@/ai/flows/calculate-project-fit-score';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Badge } from '../ui/badge';
+import { Progress } from '../ui/progress';
 
 type ProjectFormProps = {
   project?: Project;
@@ -38,10 +43,22 @@ type Resource = {
   allocation: number;
 };
 
+type FitScoreResult = (CalculateProjectFitScoreOutput & { userId: string }) | null;
+
+
 export function ProjectForm({ project }: ProjectFormProps) {
   const { toast } = useToast();
   const router = useRouter();
   const isEditMode = !!project;
+
+  const [techStack, setTechStack] = useState({
+    languages: project?.techStack.languages.join(', ') || '',
+    frameworks: project?.techStack.frameworks.join(', ') || '',
+    databases: project?.techStack.databases.join(', ') || '',
+    cloudProvider: project?.techStack.cloudProvider || '',
+    integrations: project?.techStack.integrations.join(', ') || '',
+    devOps: project?.techStack.devOps.join(', ') || '',
+  });
 
   const initialResources =
     project?.resources.teamMembers.map((tm) => ({
@@ -52,6 +69,8 @@ export function ProjectForm({ project }: ProjectFormProps) {
     })) || [];
 
   const [resources, setResources] = useState<Resource[]>(initialResources);
+  const [isCheckingFit, startFitCheck] = useTransition();
+  const [fitScores, setFitScores] = useState<Record<string, FitScoreResult>>({});
 
   const handleAddResource = () => {
     setResources([
@@ -72,6 +91,54 @@ export function ProjectForm({ project }: ProjectFormProps) {
     setResources(
       resources.map((r) => (r.id === id ? { ...r, [field]: value } : r))
     );
+     if (field === 'userId') {
+      // Clear fit score when user changes
+      setFitScores(prev => {
+        const newScores = { ...prev };
+        delete newScores[id];
+        return newScores;
+      });
+    }
+  };
+
+  const handleTechStackChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setTechStack(prev => ({...prev, [name]: value}));
+  };
+
+  const handleCheckFit = (resourceId: string, userId: string) => {
+    if (!userId) {
+      toast({
+        variant: 'destructive',
+        title: 'No Staff Member Selected',
+        description: 'Please select a staff member before checking their fit.',
+      });
+      return;
+    }
+
+    const combinedTechStack = Object.values(techStack).flatMap(item => item.split(',').map(s => s.trim()).filter(Boolean));
+    if(combinedTechStack.length === 0) {
+        toast({
+            variant: 'destructive',
+            title: 'Tech Stack is Empty',
+            description: 'Please define the technical stack for the project first.',
+        });
+        return;
+    }
+
+    startFitCheck(async () => {
+      const result = await getFitScoreAction(userId, combinedTechStack);
+      if (result.error) {
+        toast({
+          variant: 'destructive',
+          title: 'Error Calculating Fit',
+          description: result.error,
+        });
+         setFitScores(prev => ({...prev, [resourceId]: null}));
+      } else if (result.data) {
+        setFitScores(prev => ({...prev, [resourceId]: { ...result.data, userId }}));
+      }
+    });
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -151,11 +218,44 @@ export function ProjectForm({ project }: ProjectFormProps) {
             </CardContent>
           </Card>
 
+          <Card>
+            <CardHeader>
+              <CardTitle>Technical Stack</CardTitle>
+              <CardDescription>Specify the technologies used in this project. Use comma-separated values.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid sm:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="languages">Programming Languages</Label>
+                <Input id="languages" name="languages" placeholder="e.g., TypeScript, C#" value={techStack.languages} onChange={handleTechStackChange} />
+              </div>
+               <div className="space-y-2">
+                <Label htmlFor="frameworks">Frameworks & Libraries</Label>
+                <Input id="frameworks" name="frameworks" placeholder="e.g., Next.js, .NET Core" value={techStack.frameworks} onChange={handleTechStackChange} />
+              </div>
+               <div className="space-y-2">
+                <Label htmlFor="databases">Databases</Label>
+                <Input id="databases" name="databases" placeholder="e.g., Firestore, SQL Server" value={techStack.databases} onChange={handleTechStackChange} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cloudProvider">Cloud Provider</Label>
+                <Input id="cloudProvider" name="cloudProvider" placeholder="e.g., Firebase, Azure" value={techStack.cloudProvider} onChange={handleTechStackChange} />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="integrations">Third-party Integrations</Label>
+                <Input id="integrations" name="integrations" placeholder="e.g., Stripe, SendGrid" value={techStack.integrations} onChange={handleTechStackChange} />
+              </div>
+               <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="devOps">DevOps Tools</Label>
+                <Input id="devOps" name="devOps" placeholder="e.g., GitHub Actions, Jira, Docker" value={techStack.devOps} onChange={handleTechStackChange} />
+              </div>
+            </CardContent>
+          </Card>
+
            <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Resources & Roles</CardTitle>
-                <CardDescription>Manage team members and their allocation.</CardDescription>
+                <CardDescription>Manage team members and their allocation. Check their skill fit.</CardDescription>
               </div>
                <Button type="button" variant="outline" size="sm" onClick={handleAddResource}>
                 <PlusCircle className="mr-2 h-4 w-4" />
@@ -164,94 +264,117 @@ export function ProjectForm({ project }: ProjectFormProps) {
             </CardHeader>
             <CardContent className="space-y-4">
               {resources.map((resource) => (
-                <div key={resource.id} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center">
-                  <div className="md:col-span-5 space-y-1">
-                     <Label htmlFor={`resource-user-${resource.id}`} className="text-xs">Staff Member</Label>
-                    <Select
-                      name={`resource_user_${resource.id}`}
-                      value={resource.userId}
-                      onValueChange={(value) => handleResourceChange(resource.id, 'userId', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select staff member" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {staffData.map((staff: StaffMember) => (
-                          <SelectItem key={staff.id} value={staff.id}>
-                            {staff.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                <div key={resource.id} className="p-4 border rounded-lg space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center">
+                    <div className="md:col-span-4 space-y-1">
+                      <Label htmlFor={`resource-user-${resource.id}`} className="text-xs">Staff Member</Label>
+                      <Select
+                        name={`resource_user_${resource.id}`}
+                        value={resource.userId}
+                        onValueChange={(value) => handleResourceChange(resource.id, 'userId', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select staff member" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {staffData.map((staff: StaffMember) => (
+                            <SelectItem key={staff.id} value={staff.id}>
+                              {staff.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="md:col-span-3 space-y-1">
+                      <Label htmlFor={`resource-role-${resource.id}`} className="text-xs">Role</Label>
+                      <Input
+                        id={`resource-role-${resource.id}`}
+                        name={`resource_role_${resource.id}`}
+                        placeholder="e.g., Lead Developer"
+                        value={resource.role}
+                        onChange={(e) => handleResourceChange(resource.id, 'role', e.target.value)}
+                      />
+                    </div>
+                    <div className="md:col-span-2 space-y-1">
+                      <Label htmlFor={`resource-alloc-${resource.id}`} className="text-xs">Allocation %</Label>
+                      <Input
+                        id={`resource-alloc-${resource.id}`}
+                        name={`resource_alloc_${resource.id}`}
+                        type="number"
+                        placeholder="100"
+                        value={resource.allocation}
+                        onChange={(e) => handleResourceChange(resource.id, 'allocation', parseInt(e.target.value) || 0)}
+                      />
+                    </div>
+                    <div className="md:col-span-3 flex items-end justify-end h-full gap-1">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleCheckFit(resource.id, resource.userId)}
+                        disabled={isCheckingFit}
+                      >
+                         {isCheckingFit ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                        Check Fit
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive"
+                        onClick={() => handleRemoveResource(resource.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                   <div className="md:col-span-4 space-y-1">
-                     <Label htmlFor={`resource-role-${resource.id}`} className="text-xs">Role</Label>
-                    <Input
-                      id={`resource-role-${resource.id}`}
-                      name={`resource_role_${resource.id}`}
-                      placeholder="e.g., Lead Developer"
-                      value={resource.role}
-                      onChange={(e) => handleResourceChange(resource.id, 'role', e.target.value)}
-                    />
-                  </div>
-                  <div className="md:col-span-2 space-y-1">
-                     <Label htmlFor={`resource-alloc-${resource.id}`} className="text-xs">Allocation %</Label>
-                    <Input
-                      id={`resource-alloc-${resource.id}`}
-                      name={`resource_alloc_${resource.id}`}
-                      type="number"
-                      placeholder="100"
-                       value={resource.allocation}
-                      onChange={(e) => handleResourceChange(resource.id, 'allocation', parseInt(e.target.value) || 0)}
-                    />
-                  </div>
-                  <div className="md:col-span-1 flex items-end justify-end h-full">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive"
-                      onClick={() => handleRemoveResource(resource.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  {fitScores[resource.id] && (
+                    <div className="border-t pt-4 mt-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-sm font-medium">AI Fit Assessment for {staffData.find(s => s.id === resource.userId)?.name}</p>
+                         <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                              <Info className="h-4 w-4 text-muted-foreground" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80">
+                            <div className="grid gap-4">
+                              <div className="space-y-2">
+                                <h4 className="font-medium leading-none">Fit Score Details</h4>
+                                <p className="text-sm text-muted-foreground">
+                                  {fitScores[resource.id]?.explanation}
+                                </p>
+                              </div>
+                              <div className="grid gap-2">
+                                <div className="font-semibold">Matching Skills</div>
+                                {fitScores[resource.id]!.matchingSkills.length > 0 ? (
+                                    <div className="flex flex-wrap gap-1">
+                                    {fitScores[resource.id]!.matchingSkills.map(skill => <Badge key={skill} variant="secondary">{skill}</Badge>)}
+                                    </div>
+                                ) : <p className="text-sm text-muted-foreground">None</p>}
+                              </div>
+                               <div className="grid gap-2">
+                                <div className="font-semibold">Missing Skills</div>
+                                 {fitScores[resource.id]!.missingSkills.length > 0 ? (
+                                    <div className="flex flex-wrap gap-1">
+                                    {fitScores[resource.id]!.missingSkills.map(skill => <Badge key={skill} variant="destructive">{skill}</Badge>)}
+                                    </div>
+                                ) : <p className="text-sm text-muted-foreground">None</p>}
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <Progress value={fitScores[resource.id]?.fitScore || 0} className="w-full" />
+                        <span className="font-bold text-lg">{fitScores[resource.id]?.fitScore.toFixed(0)}%</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
                {resources.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No team members added.</p>}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Technical Stack</CardTitle>
-              <CardDescription>Specify the technologies used in this project.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid sm:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="languages">Programming Languages</Label>
-                <Input id="languages" name="languages" placeholder="e.g., TypeScript, C#" />
-              </div>
-               <div className="space-y-2">
-                <Label htmlFor="frameworks">Frameworks & Libraries</Label>
-                <Input id="frameworks" name="frameworks" placeholder="e.g., Next.js, .NET Core" />
-              </div>
-               <div className="space-y-2">
-                <Label htmlFor="databases">Databases</Label>
-                <Input id="databases" name="databases" placeholder="e.g., Firestore, SQL Server" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cloudProvider">Cloud Provider</Label>
-                <Input id="cloudProvider" name="cloudProvider" placeholder="e.g., Firebase, Azure" />
-              </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="integrations">Third-party Integrations</Label>
-                <Input id="integrations" name="integrations" placeholder="e.g., Stripe, SendGrid" />
-              </div>
-               <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="devOps">DevOps Tools</Label>
-                <Input id="devOps" name="devOps" placeholder="e.g., GitHub Actions, Jira, Docker" />
-              </div>
             </CardContent>
           </Card>
           
