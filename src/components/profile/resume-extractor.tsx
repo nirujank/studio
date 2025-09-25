@@ -81,7 +81,7 @@ export function ResumeExtractor({ onSkillsExtracted }: ResumeExtractorProps) {
              <div className="mt-4">
               <p className="text-sm font-medium mb-2">Successfully extracted skills:</p>
               <div className="flex flex-wrap gap-2">
-                {state.skills.map(skill => <Badge key={skill}>{skill}</Badge>)}
+                {state.skills.map((skill, index) => <Badge key={`${skill}-${index}`}>{skill}</Badge>)}
               </div>
             </div>
           )}

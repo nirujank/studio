@@ -37,7 +37,7 @@ export function SkillsTab({ skills: initialSkills }: SkillsTabProps) {
           {skills.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {skills.map((skill, index) => (
-                <Badge key={index} variant="secondary" className="text-sm">
+                <Badge key={`${skill}-${index}`} variant="secondary" className="text-sm">
                   {skill}
                 </Badge>
               ))}
