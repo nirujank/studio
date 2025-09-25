@@ -20,9 +20,11 @@ import { staffData } from '@/lib/data';
 import { useActionState, useEffect, useRef, useTransition } from 'react';
 import { useFormStatus } from 'react-dom';
 import { assessLeaveRequestAction, type LeaveRequestState } from '@/app/actions';
-import { Loader2, Sparkles, AlertCircle, CheckCircle, XCircle, RotateCcw } from 'lucide-react';
+import { Loader2, Sparkles, AlertCircle, CheckCircle, XCircle, RotateCcw, Send } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { DatePicker } from '../ui/date-picker';
+import { useToast } from '@/hooks/use-toast';
+import { useNotifications } from '@/hooks/use-notifications';
 
 type LeaveRequestDialogProps = {
   isOpen: boolean;
@@ -51,6 +53,8 @@ export function LeaveRequestDialog({ isOpen, onOpenChange, staffId }: LeaveReque
   const [state, formAction, isPending] = useActionState(assessLeaveRequestAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const [isResetting, startResetTransition] = useTransition();
+  const { addNotification } = useNotifications();
+  const { toast } = useToast();
 
   const handleNewRequest = () => {
     startResetTransition(() => {
@@ -67,8 +71,26 @@ export function LeaveRequestDialog({ isOpen, onOpenChange, staffId }: LeaveReque
         // Use a timeout to avoid updating state while the component is unmounting
         setTimeout(handleNewRequest, 100);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
+  const handleSendToPCO = () => {
+    const user = staffData.find(s => s.id === staffId);
+    if (!user) return;
+    
+    addNotification({
+      title: "New Leave Request",
+      description: `${user.name} has submitted a leave request for review.`,
+      href: `/staff/${user.id}`,
+    });
+
+    toast({
+      title: "Request Sent",
+      description: "Your leave request has been sent to the PCO admin for approval.",
+    });
+
+    onOpenChange(false);
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -97,11 +119,16 @@ export function LeaveRequestDialog({ isOpen, onOpenChange, staffId }: LeaveReque
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={() => onOpenChange(false)} variant="ghost">Close</Button>
-              <Button onClick={handleNewRequest} disabled={isResetting}>
+              <Button onClick={handleNewRequest} disabled={isResetting} variant="outline">
                 {isResetting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RotateCcw className="mr-2 h-4 w-4" />}
                 New Request
               </Button>
+               {state.data.isEligible && (
+                <Button onClick={handleSendToPCO}>
+                  <Send className="mr-2 h-4 w-4" />
+                  Send Request to PCO
+                </Button>
+              )}
             </DialogFooter>
           </div>
         ) : (
