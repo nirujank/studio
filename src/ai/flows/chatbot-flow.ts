@@ -3,13 +3,13 @@
 /**
  * @fileOverview A chatbot flow that answers questions about platform data, with role-based access.
  *
- * - chatbotFlow - The main function that handles chatbot queries.
+ * - runChatbotFlow - The main function that handles chatbot queries.
  * - ChatbotInput - The input type for the chatbotFlow function.
  * - ChatbotOutput - The return type for the chatbotFlow function.
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 import { staffData, projectData, tenantData } from '@/lib/data';
 
 export const ChatbotInputSchema = z.object({
@@ -60,7 +60,7 @@ Instructions:
 });
 
 
-export const chatbotFlow = ai.defineFlow(
+const chatbotFlow = ai.defineFlow(
   {
     name: 'chatbotFlow',
     inputSchema: ChatbotInputSchema,
@@ -98,3 +98,7 @@ export const chatbotFlow = ai.defineFlow(
     return output!;
   }
 );
+
+export async function runChatbotFlow(input: ChatbotInput): Promise<ChatbotOutput> {
+  return chatbotFlow(input);
+}
