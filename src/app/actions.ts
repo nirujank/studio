@@ -190,8 +190,8 @@ export async function extractProjectInfoAction(
 const leaveRequestSchema = z.object({
   staffId: z.string().min(1, 'Staff member is required.'),
   leaveType: z.enum(['sick', 'vacation', 'personal'], { required_error: 'Leave type is required.' }),
-  startDate: z.string().min(1, 'Start date is required.'),
-  endDate: z.string().min(1, 'End date is required.'),
+  startDate: z.string({required_error: 'Start date is required.'}).min(1, 'Start date is required.'),
+  endDate: z.string({required_error: 'End date is required.'}).min(1, 'End date is required.'),
 }).refine(data => new Date(data.endDate) >= new Date(data.startDate), {
     message: "End date cannot be before start date.",
     path: ["endDate"],
