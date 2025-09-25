@@ -1,3 +1,4 @@
+
 export type StaffMember = {
   id: string;
   name: string;
@@ -463,8 +464,54 @@ export const projectData: Project[] = [
       wikiUrl: '/wiki/gld',
     },
     risks: [],
+  },
+  {
+    id: 'PROJ-003',
+    name: 'Quantum Leap',
+    code: 'QL-2024',
+    version: '1.0',
+    owner: 'R&D Department',
+    manager: 'Alex Johnson',
+    tenantId: 'TEN-001',
+    tenantName: 'Innovate Corp',
+    resources: {
+      teamMembers: [
+        { userId: 'USR-001', name: 'Alex Johnson', role: 'Lead Scientist', allocation: 100 },
+      ],
+    },
+    techStack: {
+      languages: ['Python', 'C++'],
+      frameworks: ['Qiskit', 'TensorFlow'],
+      databases: ['HDF5'],
+      cloudProvider: 'AWS',
+      integrations: [],
+      devOps: ['Git', 'Docker'],
+    },
+    timeline: {
+      startDate: '2024-08-01',
+      endDate: '2025-08-01',
+      estimatedHours: 2000,
+      milestones: [
+        { name: 'Proof of Concept', date: '2024-12-01', status: 'Pending' },
+      ],
+    },
+    support: {
+      bugTrackerUrl: '',
+      sla: '',
+      escalationContacts: [],
+    },
+    documentation: {
+      architectureUrl: '',
+      apiUrl: '',
+      wikiUrl: '',
+    },
+    risks: [
+      { description: 'High technical uncertainty.', mitigation: 'Iterative research sprints.' },
+    ],
   }
 ];
 
 
 export const currentUser = staffData[0];
+
+    
