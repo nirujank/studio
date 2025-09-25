@@ -2,23 +2,24 @@
 'use server';
 
 import { extractSkillsFromResume } from '@/ai/flows/extract-skills-from-resume';
+import { extractInfoFromResume } from '@/ai/flows/extract-info-from-resume';
 import { z } from 'zod';
 
-const schema = z.object({
+const skillsSchema = z.object({
   resume: z.any(),
 });
 
-type State = {
+type SkillsState = {
   skills?: string[];
   error?: string;
 };
 
 export async function extractSkillsAction(
-  prevState: State,
+  prevState: SkillsState,
   formData: FormData
-): Promise<State> {
+): Promise<SkillsState> {
   try {
-    const validatedFields = schema.safeParse({
+    const validatedFields = skillsSchema.safeParse({
       resume: formData.get('resume'),
     });
 
@@ -49,3 +50,52 @@ export async function extractSkillsAction(
     return { error: 'An unexpected error occurred. Please try again.' };
   }
 }
+
+
+const infoSchema = z.object({
+  resume: z.any(),
+});
+
+
+export type InfoState = {
+  data?: any;
+  error?: string;
+};
+
+export async function extractInfoAction(
+  prevState: InfoState,
+  formData: FormData
+): Promise<InfoState> {
+  try {
+    const validatedFields = infoSchema.safeParse({
+      resume: formData.get('resume'),
+    });
+
+    if (!validatedFields.success) {
+      return { error: 'Invalid resume file.' };
+    }
+    
+    const file = formData.get('resume') as File;
+    if (!file || file.size === 0) {
+      return { error: 'Please upload a resume file.' };
+    }
+
+    const buffer = await file.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString('base64');
+    const dataUri = `data:${file.type};base64,${base64}`;
+
+    const result = await extractInfoFromResume({
+      resumeDataUri: dataUri,
+    });
+    
+    if (result) {
+      return { data: result };
+    } else {
+      return { error: "Couldn't extract any information. Try a different file." };
+    }
+  } catch (e) {
+    console.error(e);
+    return { error: 'An unexpected error occurred. Please try again.' };
+  }
+}
+

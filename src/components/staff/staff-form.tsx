@@ -22,6 +22,8 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import { ResumeUploader } from './resume-uploader';
 
 type StaffFormProps = {
   staffMember?: StaffMember;
@@ -32,10 +34,45 @@ export function StaffForm({ staffMember }: StaffFormProps) {
   const router = useRouter();
   const isEditMode = !!staffMember;
 
+  const [formData, setFormData] = useState({
+    name: staffMember?.name || '',
+    email: staffMember?.email || '',
+    phone: staffMember?.profile.personal.phone || '',
+    address: staffMember?.profile.personal.address || '',
+    tenantId: staffMember?.tenantId || '',
+    employmentCategory: staffMember?.employmentCategory || '',
+    category: staffMember?.category || '',
+    homeOffice: staffMember?.homeOffice || '',
+    contractualOffice: staffMember?.contractualOffice || '',
+    region: staffMember?.region || '',
+  });
+
+  const handleInfoExtracted = (info: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      name: info.personal?.name || prev.name,
+      email: info.personal?.email || prev.email,
+      phone: info.personal?.phone || prev.phone,
+    }));
+    toast({
+      title: 'Information Extracted',
+      description: 'The form has been populated with data from the resume.',
+    });
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const name = formData.get('name') as string;
+    const name = formData.name;
 
     toast({
       title: isEditMode ? 'Staff Updated' : 'Staff Added',
@@ -49,6 +86,9 @@ export function StaffForm({ staffMember }: StaffFormProps) {
     <form onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
+          {!isEditMode && (
+            <ResumeUploader onInfoExtracted={handleInfoExtracted} />
+          )}
           <Card>
             <CardHeader>
               <CardTitle>Personal Information</CardTitle>
@@ -57,19 +97,19 @@ export function StaffForm({ staffMember }: StaffFormProps) {
             <CardContent className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
-                <Input id="name" name="name" defaultValue={staffMember?.name} required />
+                <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email Address</Label>
-                <Input id="email" name="email" type="email" defaultValue={staffMember?.email} required />
+                <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number</Label>
-                <Input id="phone" name="phone" type="tel" defaultValue={staffMember?.profile.personal.phone} />
+                <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleChange} />
               </div>
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="address">Address</Label>
-                <Textarea id="address" name="address" defaultValue={staffMember?.profile.personal.address} />
+                <Textarea id="address" name="address" value={formData.address} onChange={handleChange} />
               </div>
             </CardContent>
           </Card>
@@ -82,7 +122,7 @@ export function StaffForm({ staffMember }: StaffFormProps) {
             <CardContent className="grid sm:grid-cols-2 gap-4">
                <div className="space-y-2">
                 <Label htmlFor="tenantId">Tenant</Label>
-                 <Select name="tenantId" defaultValue={staffMember?.tenantId}>
+                 <Select name="tenantId" value={formData.tenantId} onValueChange={(value) => handleSelectChange('tenantId', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select tenant" />
                   </SelectTrigger>
@@ -95,7 +135,7 @@ export function StaffForm({ staffMember }: StaffFormProps) {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="employmentCategory">Employment Category</Label>
-                 <Select name="employmentCategory" defaultValue={staffMember?.employmentCategory}>
+                 <Select name="employmentCategory" value={formData.employmentCategory} onValueChange={(value) => handleSelectChange('employmentCategory', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
@@ -108,7 +148,7 @@ export function StaffForm({ staffMember }: StaffFormProps) {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="category">Job Category</Label>
-                 <Select name="category" defaultValue={staffMember?.category}>
+                 <Select name="category" value={formData.category} onValueChange={(value) => handleSelectChange('category', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select job category" />
                   </SelectTrigger>
@@ -123,15 +163,15 @@ export function StaffForm({ staffMember }: StaffFormProps) {
               </div>
                 <div className="space-y-2">
                 <Label htmlFor="homeOffice">Home Office</Label>
-                <Input id="homeOffice" name="homeOffice" defaultValue={staffMember?.homeOffice} />
+                <Input id="homeOffice" name="homeOffice" value={formData.homeOffice} onChange={handleChange} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="contractualOffice">Contractual Office</Label>
-                <Input id="contractualOffice" name="contractualOffice" defaultValue={staffMember?.contractualOffice} />
+                <Input id="contractualOffice" name="contractualOffice" value={formData.contractualOffice} onChange={handleChange} />
               </div>
                 <div className="space-y-2">
                 <Label htmlFor="region">Region</Label>
-                 <Select name="region" defaultValue={staffMember?.region}>
+                 <Select name="region" value={formData.region} onValueChange={(value) => handleSelectChange('region', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select region" />
                   </SelectTrigger>
