@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { projectData } from '@/lib/data';
 import { useState, useEffect, useMemo } from 'react';
-import { format, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
+import { format, startOfWeek, endOfWeek, isWithinInterval, subDays } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
@@ -22,17 +22,58 @@ export type TimesheetEntry = {
   description: string;
 };
 
+const getInitialEntries = (): TimesheetEntry[] => {
+    const today = new Date();
+    // Set entries to be within the current week for demonstration
+    const monday = startOfWeek(today, { weekStartsOn: 1 });
+    return [
+         {
+            id: '1',
+            date: monday,
+            projectId: 'PROJ-001',
+            milestone: 'Full Feature Rollout',
+            hours: 8,
+            payType: 'Regular',
+            description: 'Worked on Staff Hub Portal features, focusing on the new dashboard widgets.'
+        },
+        {
+            id: '2',
+            date: new Date(monday.setDate(monday.getDate() + 1)),
+            projectId: 'PROJ-001',
+            milestone: 'Full Feature Rollout',
+            hours: 6,
+            payType: 'Regular',
+            description: 'Code reviews and addressed PR feedback.'
+        },
+        {
+            id: '3',
+            date: new Date(monday.setDate(monday.getDate() + 1)),
+            projectId: 'PROJ-003',
+            milestone: 'Proof of Concept',
+            hours: 2,
+            payType: 'Overtime',
+            description: 'Initial setup for Quantum Leap project environment.'
+        },
+    ]
+}
+
+
 export default function E6Page() {
   const [userId, setUserId] = useState<string | null>(null);
   const [entries, setEntries] = useState<TimesheetEntry[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
+    // This effect runs once on mount to set initial data
+    setEntries(getInitialEntries());
+  }, []);
+
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const id = sessionStorage.getItem('userId');
       setUserId(id);
       // In a real app, you would fetch entries for this user
-      // For now, we'll use local state
+      // For now, we'll use local state with initial data
     }
   }, []);
 
@@ -46,7 +87,7 @@ export default function E6Page() {
     const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 });
     return entries.filter(entry => 
         isWithinInterval(entry.date, { start: weekStart, end: weekEnd })
-    );
+    ).sort((a, b) => b.date.getTime() - a.date.getTime()); // Sort by most recent date first
   }, [entries]);
 
   return (
