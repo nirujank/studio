@@ -71,6 +71,11 @@ const allNavItems = [
         icon: CalendarClock,
         label: 'Leave Entitlements',
       },
+       {
+        href: '/staff/timesheets',
+        icon: Clock,
+        label: 'E6 Timesheets',
+      },
     ],
   },
   {
