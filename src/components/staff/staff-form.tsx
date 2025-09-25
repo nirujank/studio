@@ -78,7 +78,7 @@ export function StaffForm({ staffMember }: StaffFormProps) {
     staffMember?.profile.education.map((e, i) => ({ ...e, id: `${uniqueId}-edu-${i}` })) || []
   );
   const [experience, setExperience] = useState<ExperienceEntry[]>(
-    staffMember?.jobHistory.map((e, i) => ({ ...e, id: `${uniqueId}-exp-${i}` })) || []
+    staffMember?.jobHistory.map((e, i) => ({ ...e, endDate: e.endDate ?? '', id: `${uniqueId}-exp-${i}` })) || []
   );
 
   const handleInfoExtracted = useCallback((info: ExtractInfoFromResumeOutput) => {
@@ -288,7 +288,7 @@ export function StaffForm({ staffMember }: StaffFormProps) {
                     </div>
                     <div className="space-y-2">
                       <Label>End Date</Label>
-                      <Input value={exp.endDate} onChange={(e) => handleDynamicChange(experience, setExperience, exp.id, 'endDate', e.target.value)} placeholder="YYYY-MM-DD or Present" />
+                      <Input value={exp.endDate || ''} onChange={(e) => handleDynamicChange(experience, setExperience, exp.id, 'endDate', e.target.value)} placeholder="YYYY-MM-DD or Present" />
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -372,5 +372,3 @@ export function StaffForm({ staffMember }: StaffFormProps) {
     </div>
   );
 }
-
-    
