@@ -18,6 +18,7 @@ import {
   FolderKanban,
   Sparkles,
   Briefcase,
+  CalendarClock,
 } from 'lucide-react';
 import {
   SidebarMenu,
@@ -60,6 +61,11 @@ const navItems = [
         href: '/staff/history',
         icon: Briefcase,
         label: 'Job History',
+      },
+      {
+        href: '/staff/leave',
+        icon: CalendarClock,
+        label: 'Leave Entitlements',
       },
     ],
   },

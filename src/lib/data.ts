@@ -36,6 +36,20 @@ export type StaffMember = {
     endDate: string | null;
     salary: number;
   }[];
+  leave: {
+    sick: {
+      entitled: number;
+      taken: number;
+    };
+    vacation: {
+      entitled: number;
+      taken: number;
+    };
+    personal: {
+      entitled: number;
+      taken: number;
+    };
+  };
 };
 
 export const staffData: StaffMember[] = [
@@ -69,7 +83,7 @@ export const staffData: StaffMember[] = [
           year: 2012,
         },
       ],
-      skills: ['React', 'Node.js', 'TypeScript', 'GraphQL', 'AWS'],
+      skills: ['React', 'Node.js', 'TypeScript', 'GraphQL', 'AWS', 'Docker'],
       courses: ['Advanced GraphQL', 'AWS Certified Developer'],
       hobbies: ['Hiking', 'Photography', 'Playing Guitar'],
       volunteering: ['Code for America', 'Local Food Bank'],
@@ -99,6 +113,11 @@ export const staffData: StaffMember[] = [
         salary: 80000,
       },
     ],
+    leave: {
+        sick: { entitled: 10, taken: 2 },
+        vacation: { entitled: 20, taken: 5 },
+        personal: { entitled: 5, taken: 1 },
+    }
   },
   {
     id: 'USR-002',
@@ -148,6 +167,11 @@ export const staffData: StaffMember[] = [
         salary: 90000,
       },
     ],
+    leave: {
+        sick: { entitled: 10, taken: 0 },
+        vacation: { entitled: 25, taken: 10 },
+        personal: { entitled: 5, taken: 2 },
+    }
   },
   {
     id: 'USR-003',
@@ -190,6 +214,11 @@ export const staffData: StaffMember[] = [
         salary: 160000,
       },
     ],
+    leave: {
+        sick: { entitled: 10, taken: 1 },
+        vacation: { entitled: 20, taken: 15 },
+        personal: { entitled: 5, taken: 0 },
+    }
   },
     {
     id: 'USR-004',
@@ -232,6 +261,11 @@ export const staffData: StaffMember[] = [
         salary: 130000,
       },
     ],
+    leave: {
+        sick: { entitled: 10, taken: 4 },
+        vacation: { entitled: 20, taken: 8 },
+        personal: { entitled: 7, taken: 5 },
+    }
   },
   {
     id: 'USR-005',
@@ -258,7 +292,7 @@ export const staffData: StaffMember[] = [
           year: 2017,
         },
       ],
-      skills: ['Python', 'Django', 'Kubernetes', 'GCP'],
+      skills: ['Python', 'Django', 'Kubernetes', 'GCP', 'Docker'],
       courses: ['Google Cloud Certified Professional Cloud Architect'],
       hobbies: ['Cycling', 'Gaming'],
       volunteering: [],
@@ -274,6 +308,11 @@ export const staffData: StaffMember[] = [
         salary: 115000,
       },
     ],
+    leave: {
+        sick: { entitled: 5, taken: 1 },
+        vacation: { entitled: 15, taken: 10 },
+        personal: { entitled: 0, taken: 0 },
+    }
   },
 ];
 
@@ -508,6 +547,47 @@ export const projectData: Project[] = [
     risks: [
       { description: 'High technical uncertainty.', mitigation: 'Iterative research sprints.' },
     ],
+  },
+  {
+    "id": "PROJ-166258",
+    "name": "New Awesome Project",
+    "code": "NAP-1",
+    "version": "1.0",
+    "owner": "Marketing",
+    "manager": "Alex J",
+    "tenantId": "TEN-001",
+    "tenantName": "Innovate Corp",
+    "techStack": {
+      "languages": [
+        "python",
+        "typescript"
+      ],
+      "frameworks": [],
+      "databases": [],
+      "cloudProvider": "",
+      "integrations": [],
+      "devOps": []
+    },
+    "timeline": {
+      "startDate": "2024-07-29T00:00:00.000Z",
+      "endDate": "2024-08-30T00:00:00.000Z",
+      "estimatedHours": 0,
+      "milestones": []
+    },
+    "resources": {
+      "teamMembers": []
+    },
+    "support": {
+      "bugTrackerUrl": "",
+      "sla": "",
+      "escalationContacts": []
+    },
+    "documentation": {
+      "architectureUrl": "",
+      "apiUrl": "",
+      "wikiUrl": ""
+    },
+    "risks": []
   }
 ];
 
