@@ -15,6 +15,7 @@ import {
   FileText,
   UserCheck,
   CalendarCheck,
+  FolderKanban,
 } from 'lucide-react';
 import {
   SidebarMenu,
@@ -84,6 +85,11 @@ const navItems = [
     href: '/security',
     icon: Shield,
     label: 'Security',
+  },
+  {
+    href: '/projects',
+    icon: FolderKanban,
+    label: 'Projects',
   },
   {
     href: '/profile',

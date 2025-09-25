@@ -312,5 +312,159 @@ export const tenantData: Tenant[] = [
   },
 ];
 
+export type Project = {
+  id: string;
+  name: string;
+  code: string;
+  version: string;
+  owner: string;
+  manager: string;
+  tenantId: string;
+  tenantName: string;
+  resources: {
+    teamMembers: {
+      userId: string;
+      name: string;
+      role: string;
+      allocation: number;
+    }[];
+  };
+  techStack: {
+    languages: string[];
+    frameworks: string[];
+    databases: string[];
+    cloudProvider: string;
+    integrations: string[];
+    devOps: string[];
+  };
+  timeline: {
+    startDate: string;
+    endDate: string;
+    estimatedHours: number;
+    milestones: {
+      name: string;
+      date: string;
+      status: 'Completed' | 'In Progress' | 'Pending';
+    }[];
+  };
+  support: {
+    bugTrackerUrl: string;
+    sla: string;
+    escalationContacts: string[];
+  };
+  documentation: {
+    architectureUrl: string;
+    apiUrl: string;
+    wikiUrl: string;
+  };
+  risks: {
+    description: string;
+    mitigation: string;
+  }[];
+  financials?: {
+    estimatedCost: number;
+    actualCost: number;
+    licensingCost: number;
+    budgetOwner: string;
+  };
+};
+
+export const projectData: Project[] = [
+  {
+    id: 'PROJ-001',
+    name: 'Staff Hub Portal',
+    code: 'SHP-2024',
+    version: '1.0.0',
+    owner: 'Invorg Leadership',
+    manager: 'Chen Wei',
+    tenantId: 'TEN-001',
+    tenantName: 'Innovate Corp',
+    resources: {
+      teamMembers: [
+        { userId: 'USR-001', name: 'Alex Johnson', role: 'Lead Developer', allocation: 100 },
+        { userId: 'USR-002', name: 'Maria Garcia', role: 'Lead Designer', allocation: 50 },
+        { userId: 'USR-005', name: 'Ben Carter', role: 'DevOps Engineer', allocation: 75 },
+      ],
+    },
+    techStack: {
+      languages: ['TypeScript'],
+      frameworks: ['Next.js', 'React', 'Tailwind CSS'],
+      databases: ['Firestore'],
+      cloudProvider: 'Firebase',
+      integrations: ['Genkit AI'],
+      devOps: ['GitHub', 'Firebase App Hosting'],
+    },
+    timeline: {
+      startDate: '2024-05-01',
+      endDate: '2024-09-30',
+      estimatedHours: 800,
+      milestones: [
+        { name: 'MVP Launch', date: '2024-07-15', status: 'Completed' },
+        { name: 'Full Feature Rollout', date: '2024-09-01', status: 'In Progress' },
+      ],
+    },
+    support: {
+      bugTrackerUrl: 'https://github.com/issues',
+      sla: '24-hour response',
+      escalationContacts: ['Chen Wei'],
+    },
+    documentation: {
+      architectureUrl: '/docs/architecture',
+      apiUrl: '/docs/api',
+      wikiUrl: '/wiki',
+    },
+    risks: [
+      { description: 'AI feature complexity may cause delays.', mitigation: 'Allocate additional dev time for AI tasks.' },
+    ],
+    financials: {
+      estimatedCost: 50000,
+      actualCost: 0,
+      licensingCost: 2000,
+      budgetOwner: 'Finance Dept',
+    },
+  },
+  {
+    id: 'PROJ-002',
+    name: 'Global Logistics Dashboard',
+    code: 'GLD-2025',
+    version: '2.1.0',
+    owner: 'Global Solutions Board',
+    manager: 'Samira Khan',
+    tenantId: 'TEN-002',
+    tenantName: 'Global Solutions',
+    resources: {
+      teamMembers: [],
+    },
+    techStack: {
+      languages: ['C#', 'JavaScript'],
+      frameworks: ['.NET Core', 'Angular'],
+      databases: ['SQL Server'],
+      cloudProvider: 'Azure',
+      integrations: ['SAP'],
+      devOps: ['Azure DevOps'],
+    },
+    timeline: {
+      startDate: '2025-01-10',
+      endDate: '2025-12-20',
+      estimatedHours: 2500,
+      milestones: [
+        { name: 'UAT', date: '2025-11-01', status: 'Pending' },
+        { name: 'Go-Live', date: '2025-12-15', status: 'Pending' },
+      ],
+    },
+    support: {
+      bugTrackerUrl: 'https://dev.azure.com',
+      sla: 'High-priority: 4 hours',
+      escalationContacts: ['Samira Khan'],
+    },
+    documentation: {
+      architectureUrl: '/docs/gld/architecture',
+      apiUrl: '/docs/gld/api',
+      wikiUrl: '/wiki/gld',
+    },
+    risks: [],
+  }
+];
+
 
 export const currentUser = staffData[0];
