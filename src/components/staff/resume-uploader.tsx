@@ -33,7 +33,6 @@ type ResumeUploaderProps = {
 
 export function ResumeUploader({ onInfoExtracted }: ResumeUploaderProps) {
   const [state, formAction] = useActionState(extractInfoAction, initialState);
-  const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -41,35 +40,44 @@ export function ResumeUploader({ onInfoExtracted }: ResumeUploaderProps) {
       onInfoExtracted(state.data);
     }
   }, [state, onInfoExtracted]);
+  
+  const handleAction = () => {
+    const formData = new FormData();
+    if (fileInputRef.current?.files?.[0]) {
+      formData.append('resume', fileInputRef.current.files[0]);
+      formAction(formData);
+    }
+  };
 
   return (
     <Card>
-      <form ref={formRef} action={formAction}>
-        <CardHeader>
-          <CardTitle className="font-headline">AI Resume Parser</CardTitle>
-          <CardDescription>
-            Upload a resume to automatically fill out the form fields below.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <Label htmlFor="resume-file">Upload Resume</Label>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-               <Input id="resume-file" name="resume" type="file" ref={fileInputRef} accept=".pdf,.doc,.docx,.txt" required className="text-xs flex-grow" />
-               <SubmitButton />
-            </div>
+      {/* The <form> has been removed to prevent nesting. The action is now triggered by the button's onClick handler. */}
+      <CardHeader>
+        <CardTitle className="font-headline">AI Resume Parser</CardTitle>
+        <CardDescription>
+          Upload a resume to automatically fill out the form fields below.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <Label htmlFor="resume-file">Upload Resume</Label>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+             <Input id="resume-file" name="resume" type="file" ref={fileInputRef} accept=".pdf,.doc,.docx,.txt" required className="text-xs flex-grow" />
+             <Button type="button" className="w-full sm:w-auto" onClick={handleAction}>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Extract Information
+             </Button>
           </div>
+        </div>
 
-          {state?.error && (
-            <Alert variant="destructive" className="mt-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{state.error}</AlertDescription>
-            </Alert>
-          )}
-
-        </CardContent>
-      </form>
+        {state?.error && (
+          <Alert variant="destructive" className="mt-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{state.error}</AlertDescription>
+          </Alert>
+        )}
+      </CardContent>
     </Card>
   );
 }
