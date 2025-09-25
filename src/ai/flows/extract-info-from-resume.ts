@@ -27,7 +27,10 @@ const ExtractInfoFromResumeOutputSchema = z.object({
     phone: z.string().describe("The phone number of the candidate."),
     address: z.string().describe("The full address of the candidate."),
   }).describe("Personal information of the candidate."),
-  skills: z.array(z.string()).describe('A list of professional skills extracted from the resume.'),
+  skills: z.object({
+    keySkills: z.array(z.string()).describe('A list of key professional skills or competencies (e.g., Project Management, Agile Methodologies).'),
+    techSkills: z.array(z.string()).describe('A list of specific technical skills or technologies (e.g., React, Node.js, Python, AWS).'),
+  }).describe("A list of professional and technical skills extracted from the resume."),
   education: z.array(z.object({
       degree: z.string().describe("The degree obtained."),
       university: z.string().describe("The name of the university or institution."),
@@ -37,7 +40,7 @@ const ExtractInfoFromResumeOutputSchema = z.object({
     position: z.string().describe("The job title or position held."),
     company: z.string().describe("The name of the company."),
     startDate: z.string().optional().describe("The start date of the employment (YYYY-MM-DD)."),
-    endDate: z.string().optional().describe("The end date of the employment (YYYY-MM-DD), or null if current."),
+    endDate: z.string().optional().describe("The end date of the employment (YYYY-MM-DD), or 'Present' if current."),
     summary: z.string().optional().describe("A brief summary of responsibilities and achievements.")
   })).describe("The candidate's work experience.")
 });
@@ -52,7 +55,7 @@ const extractInfoFromResumePrompt = ai.definePrompt({
   input: {schema: ExtractInfoFromResumeInputSchema},
   output: {schema: ExtractInfoFromResumeOutputSchema},
   prompt: `You are an expert resume parsing AI. Your task is to extract structured information from the provided resume.
-  Carefully analyze the content and populate all the fields in the output schema.
+  Carefully analyze the content and populate all the fields in the output schema. Differentiate between general key skills (like 'leadership' or 'communication') and specific technical skills (like 'React' or 'SQL').
 
   Resume:
   {{media url=resumeDataUri}}
