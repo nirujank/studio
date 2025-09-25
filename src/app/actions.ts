@@ -8,6 +8,7 @@ import { extractProjectInfoFromBrd } from '@/ai/flows/extract-project-info-from-
 import { assessLeaveRequest } from '@/ai/flows/assess-leave-request';
 import { z } from 'zod';
 import { staffData } from '@/lib/data';
+import { differenceInDays } from 'date-fns';
 
 const skillsSchema = z.object({
   resume: z.any(),
@@ -187,9 +188,13 @@ export async function extractProjectInfoAction(
 }
 
 const leaveRequestSchema = z.object({
-  staffId: z.string(),
+  staffId: z.string().min(1),
   leaveType: z.enum(['sick', 'vacation', 'personal']),
-  leaveDays: z.coerce.number().positive(),
+  startDate: z.string().min(1, 'Start date is required.'),
+  endDate: z.string().min(1, 'End date is required.'),
+}).refine(data => new Date(data.endDate) >= new Date(data.startDate), {
+    message: "End date cannot be before start date.",
+    path: ["endDate"],
 });
 
 export type LeaveRequestState = {
@@ -202,14 +207,23 @@ export async function assessLeaveRequestAction(prevState: LeaveRequestState, for
     const validatedFields = leaveRequestSchema.safeParse({
       staffId: formData.get('staffId'),
       leaveType: formData.get('leaveType'),
-      leaveDays: formData.get('leaveDays'),
+      startDate: formData.get('startDate'),
+      endDate: formData.get('endDate'),
     });
     
     if (!validatedFields.success) {
-      return { error: 'Invalid leave request data.' };
+       const errors = validatedFields.error.flatten().fieldErrors;
+       const errorMessage = Object.values(errors).flat().join(' ') || 'Invalid leave request data.';
+      return { error: errorMessage };
     }
 
-    const { staffId, leaveType, leaveDays } = validatedFields.data;
+    const { staffId, leaveType, startDate, endDate } = validatedFields.data;
+    
+    const leaveDays = differenceInDays(new Date(endDate), new Date(startDate)) + 1;
+
+    if (leaveDays <= 0) {
+        return { error: 'Leave must be for at least one day.' };
+    }
 
     const result = await assessLeaveRequest({ staffId, leaveType, leaveDays });
 

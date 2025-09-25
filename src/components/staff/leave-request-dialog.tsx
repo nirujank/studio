@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { staffData } from '@/lib/data';
-import { useActionState, useEffect, useRef } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { assessLeaveRequestAction, type LeaveRequestState } from '@/app/actions';
 import { Loader2, Sparkles, AlertCircle, CheckCircle, XCircle, RotateCcw } from 'lucide-react';
@@ -49,23 +49,22 @@ function SubmitButton() {
 export function LeaveRequestDialog({ isOpen, onOpenChange }: LeaveRequestDialogProps) {
   const [state, formAction, isPending] = useActionState(assessLeaveRequestAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
+  // Separate state to manage form reset
+  const [formKey, setFormKey] = useState(Date.now());
   
   useEffect(() => {
     // Reset form state when dialog is closed
     if(!isOpen) {
-        formRef.current?.reset();
-        (initialState as any).data = undefined;
-        (initialState as any).error = undefined;
+        handleNewRequest();
     }
   }, [isOpen]);
 
   const handleNewRequest = () => {
-    formRef.current?.reset();
-    (initialState as any).data = undefined;
-    (initialState as any).error = undefined;
-    // This is a bit of a trick to force a state refresh for the action state
-    // since there's no built-in reset. We can just re-trigger the form action with no data.
-    formAction(new FormData());
+    // By changing the key of the form, we force it to re-mount and reset.
+    setFormKey(Date.now()); 
+    // Also clear any previous action state manually if needed
+    if(initialState.data) delete initialState.data;
+    if(initialState.error) delete initialState.error;
   };
 
   return (
@@ -78,7 +77,7 @@ export function LeaveRequestDialog({ isOpen, onOpenChange }: LeaveRequestDialogP
           </DialogDescription>
         </DialogHeader>
 
-        {state?.data ? (
+        {state?.data && !isPending ? (
           <div className="space-y-4 py-4">
             <h3 className="font-semibold text-lg">Assessment Complete</h3>
             <div>
@@ -94,16 +93,16 @@ export function LeaveRequestDialog({ isOpen, onOpenChange }: LeaveRequestDialogP
                 <p className="text-sm text-secondary-foreground">{state.data.projectImpact}</p>
               </div>
             </div>
-            <div className="flex gap-2 justify-end">
+            <DialogFooter>
               <Button onClick={() => onOpenChange(false)} variant="ghost">Close</Button>
               <Button onClick={handleNewRequest}>
                 <RotateCcw className="mr-2 h-4 w-4" />
                 New Request
               </Button>
-            </div>
+            </DialogFooter>
           </div>
         ) : (
-          <form ref={formRef} action={formAction} className="space-y-4 py-4">
+          <form key={formKey} ref={formRef} action={formAction} className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="staffId">Staff Member</Label>
               <Select name="staffId" required>
@@ -145,7 +144,7 @@ export function LeaveRequestDialog({ isOpen, onOpenChange }: LeaveRequestDialogP
                 </div>
             </div>
 
-             {state?.error && (
+             {state?.error && !isPending && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Error</AlertTitle>
@@ -153,7 +152,7 @@ export function LeaveRequestDialog({ isOpen, onOpenChange }: LeaveRequestDialogP
                 </Alert>
             )}
             <DialogFooter>
-              <Button onClick={() => onOpenChange(false)} variant="ghost">Cancel</Button>
+              <Button onClick={() => onOpenChange(false)} variant="ghost" type="button">Cancel</Button>
               <SubmitButton />
             </DialogFooter>
           </form>
