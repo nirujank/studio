@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { staffData } from '@/lib/data';
-import { useActionState, useEffect, useRef } from 'react';
+import { useActionState, useEffect, useRef, useTransition } from 'react';
 import { useFormStatus } from 'react-dom';
 import { assessLeaveRequestAction, type LeaveRequestState } from '@/app/actions';
 import { Loader2, Sparkles, AlertCircle, CheckCircle, XCircle, RotateCcw } from 'lucide-react';
@@ -50,20 +50,24 @@ function SubmitButton() {
 export function LeaveRequestDialog({ isOpen, onOpenChange }: LeaveRequestDialogProps) {
   const [state, formAction, isPending] = useActionState(assessLeaveRequestAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
+  const [isResetting, startResetTransition] = useTransition();
+
+  const handleNewRequest = () => {
+    startResetTransition(() => {
+        const formData = new FormData();
+        formData.append('reset', 'true');
+        formAction(formData);
+    });
+    formRef.current?.reset();
+  };
   
   useEffect(() => {
     // Reset form state when dialog is closed
     if(!isOpen && (state?.data || state?.error)) {
         handleNewRequest();
     }
-  }, [isOpen, state]);
+  }, [isOpen, state?.data, state?.error]);
 
-  const handleNewRequest = () => {
-    const formData = new FormData();
-    formData.append('reset', 'true');
-    formAction(formData);
-    formRef.current?.reset();
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -93,8 +97,8 @@ export function LeaveRequestDialog({ isOpen, onOpenChange }: LeaveRequestDialogP
             </div>
             <DialogFooter>
               <Button onClick={() => onOpenChange(false)} variant="ghost">Close</Button>
-              <Button onClick={handleNewRequest}>
-                <RotateCcw className="mr-2 h-4 w-4" />
+              <Button onClick={handleNewRequest} disabled={isResetting}>
+                {isResetting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RotateCcw className="mr-2 h-4 w-4" />}
                 New Request
               </Button>
             </DialogFooter>
