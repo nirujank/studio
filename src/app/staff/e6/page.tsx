@@ -8,9 +8,11 @@ import { useState, useEffect, useMemo } from 'react';
 import { format, startOfWeek, endOfWeek, isWithinInterval, startOfMonth, endOfMonth, isSameDay } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { CalendarIcon, PlusCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 export type TimesheetEntry = {
   id: string;
@@ -65,6 +67,7 @@ export default function E6Page() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>('week');
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
 
   useEffect(() => {
@@ -82,7 +85,7 @@ export default function E6Page() {
   }, []);
 
   const handleEntryAdded = (newEntry: Omit<TimesheetEntry, 'id'>) => {
-    setEntries(prev => [...prev, { ...newEntry, id: Date.now().toString() }]);
+    setEntries(prev => [...prev, { ...newEntry, id: Date.now().toString() }].sort((a, b) => b.date.getTime() - a.date.getTime()));
     setIsDialogOpen(false);
   };
   
@@ -112,6 +115,24 @@ export default function E6Page() {
   
   const entryDates = useMemo(() => entries.map(e => e.date), [entries]);
 
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+        setSelectedDate(date);
+        setIsCalendarOpen(false);
+    }
+  }
+
+  const getFilterTitle = () => {
+    switch (viewMode) {
+        case 'day':
+            return format(selectedDate, 'PPP');
+        case 'week':
+            return `${format(startOfWeek(selectedDate, { weekStartsOn: 1 }), 'MMM d')} - ${format(endOfWeek(selectedDate, { weekStartsOn: 1 }), 'MMM d, yyyy')}`;
+        case 'month':
+            return format(selectedDate, 'MMMM yyyy');
+    }
+  }
+
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -137,97 +158,83 @@ export default function E6Page() {
             </Dialog>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1 space-y-4">
-              <Card>
-                <CardContent className="p-2">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={(date) => date && setSelectedDate(date)}
-                    modifiers={{ withEntries: entryDates }}
-                    modifiersStyles={{ 
-                      withEntries: { 
-                        position: 'relative',
-                        overflow: 'visible',
-                      }
-                    }}
-                    components={{
-                       DayContent: (props) => {
-                          const hasEntry = entryDates.some(d => isSameDay(d, props.date));
-                          return (
-                            <div className="relative w-full h-full flex items-center justify-center">
-                              {props.date.getDate()}
-                              {hasEntry && <div className="absolute bottom-1 w-1 h-1 rounded-full bg-primary" />}
-                            </div>
-                          );
-                       }
-                    }}
-                    className="w-full"
-                  />
-                </CardContent>
-              </Card>
-               <Card>
-                 <CardHeader>
-                    <CardTitle className="text-base">Filter Options</CardTitle>
-                 </CardHeader>
-                <CardContent>
-                   <div className="flex gap-2">
-                      <Button variant={viewMode === 'day' ? 'default' : 'outline'} onClick={() => setViewMode('day')} className="flex-1">Day</Button>
-                      <Button variant={viewMode === 'week' ? 'default' : 'outline'} onClick={() => setViewMode('week')} className="flex-1">Week</Button>
-                      <Button variant={viewMode === 'month' ? 'default' : 'outline'} onClick={() => setViewMode('month')} className="flex-1">Month</Button>
-                  </div>
-                </CardContent>
-              </Card>
-          </div>
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  Entries for {viewMode === 'day' ? format(selectedDate, 'PPP') : `${format(startOfWeek(selectedDate, {weekStartsOn: 1}), 'MMM d')} - ${format(endOfWeek(selectedDate, {weekStartsOn: 1}), 'MMM d, yyyy')}`}
-                </CardTitle>
-                <CardDescription>
-                  A summary of hours logged. Total: <span className="font-bold text-foreground">{totalHours} hours</span>
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Project</TableHead>
-                      <TableHead>Hours</TableHead>
-                      <TableHead>Pay Type</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {displayedEntries.length > 0 ? (
-                      displayedEntries.map(entry => {
-                        const project = projectData.find(p => p.id === entry.projectId);
-                        return (
-                          <TableRow key={entry.id}>
-                            <TableCell>{format(entry.date, 'PPP')}</TableCell>
-                            <TableCell>{project?.name || 'N/A'}</TableCell>
-                            <TableCell>{entry.hours}</TableCell>
-                            <TableCell>
-                              <Badge variant={entry.payType === 'Overtime' ? 'destructive' : 'secondary'}>{entry.payType}</Badge>
-                            </TableCell>
-                          </TableRow>
-                        )
-                      })
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={4} className="text-center text-muted-foreground">
-                          No entries for this period.
+        <Card>
+            <CardHeader>
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                <div>
+                    <CardTitle>
+                    Entries for {getFilterTitle()}
+                    </CardTitle>
+                    <CardDescription>
+                    A summary of hours logged. Total: <span className="font-bold text-foreground">{totalHours} hours</span>
+                    </CardDescription>
+                </div>
+                 <div className="flex gap-2 items-center">
+                    <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                        <PopoverTrigger asChild>
+                            <Button
+                            variant={"outline"}
+                            className={cn(
+                                "w-[240px] justify-start text-left font-normal",
+                                !selectedDate && "text-muted-foreground"
+                            )}
+                            >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="end">
+                            <Calendar
+                                mode="single"
+                                selected={selectedDate}
+                                onSelect={handleDateSelect}
+                                disabled={(date) => date > new Date()}
+                                initialFocus
+                            />
+                        </PopoverContent>
+                    </Popover>
+                    <Button variant={viewMode === 'day' ? 'default' : 'outline'} onClick={() => setViewMode('day')}>Day</Button>
+                    <Button variant={viewMode === 'week' ? 'default' : 'outline'} onClick={() => setViewMode('week')}>Week</Button>
+                    <Button variant={viewMode === 'month' ? 'default' : 'outline'} onClick={() => setViewMode('month')}>Month</Button>
+                </div>
+            </div>
+            </CardHeader>
+            <CardContent>
+            <Table>
+                <TableHeader>
+                <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Project</TableHead>
+                    <TableHead>Hours</TableHead>
+                    <TableHead>Pay Type</TableHead>
+                </TableRow>
+                </TableHeader>
+                <TableBody>
+                {displayedEntries.length > 0 ? (
+                    displayedEntries.map(entry => {
+                    const project = projectData.find(p => p.id === entry.projectId);
+                    return (
+                        <TableRow key={entry.id}>
+                        <TableCell>{format(entry.date, 'PPP')}</TableCell>
+                        <TableCell>{project?.name || 'N/A'}</TableCell>
+                        <TableCell>{entry.hours}</TableCell>
+                        <TableCell>
+                            <Badge variant={entry.payType === 'Overtime' ? 'destructive' : 'secondary'}>{entry.payType}</Badge>
                         </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+                        </TableRow>
+                    )
+                    })
+                ) : (
+                    <TableRow>
+                    <TableCell colSpan={4} className="text-center text-muted-foreground">
+                        No entries for this period.
+                    </TableCell>
+                    </TableRow>
+                )}
+                </TableBody>
+            </Table>
+            </CardContent>
+        </Card>
       </div>
     </AppLayout>
   );
