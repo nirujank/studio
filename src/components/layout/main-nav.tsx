@@ -30,22 +30,26 @@ import {
 } from '@/components/ui/sidebar';
 import { useSidebar } from '../ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
+import { useEffect, useState } from 'react';
 
-const navItems = [
+const allNavItems = [
   {
     href: '/dashboard',
     icon: LayoutDashboard,
     label: 'Dashboard',
+    role: 'admin',
   },
   {
     href: '/tenants',
     icon: Building2,
     label: 'Tenants',
+    role: 'admin',
   },
   {
     label: 'Staff',
     icon: Users,
     href: '/staff',
+    role: 'admin',
     subItems: [
       {
         href: '/staff',
@@ -73,11 +77,13 @@ const navItems = [
     href: '/projects',
     icon: FolderKanban,
     label: 'Projects',
+    role: 'admin',
   },
   {
     label: 'Recruitment',
     icon: ClipboardList,
     href: '/recruitment',
+    role: 'admin',
     subItems: [
       {
         href: '/recruitment/requisitions',
@@ -100,36 +106,77 @@ const navItems = [
     href: '/time-leave',
     icon: Clock,
     label: 'Time & Leave',
+    role: 'admin',
   },
   {
     href: '/performance',
     icon: TrendingUp,
     label: 'Performance',
+    role: 'admin',
   },
   {
     href: '/capacity',
     icon: PieChart,
     label: 'Capacity',
+    role: 'admin',
   },
   {
     href: '/security',
     icon: Shield,
     label: 'Security',
+    role: 'admin',
   },
   {
     href: '/profile',
     icon: UserCircle,
     label: 'My Profile',
+    role: 'staff',
   },
 ];
 
 export function MainNav() {
   const pathname = usePathname();
   const { state } = useSidebar();
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const role = sessionStorage.getItem('userRole');
+      setUserRole(role);
+    }
+  }, []);
+
+  const getProfileLink = () => {
+    if (typeof window !== 'undefined') {
+      const userId = sessionStorage.getItem('userId');
+      if (userRole === 'staff' && userId) {
+        return `/staff/${userId}`;
+      }
+    }
+    return '/profile'; // Fallback for admin or if userId not found
+  }
+
+  const navItems = allNavItems.filter(item => {
+    if (userRole === 'admin') {
+        // Admin sees everything except the staff-specific "My Profile"
+        return item.role === 'admin' || item.href === '/profile';
+    }
+    if (userRole === 'staff') {
+        // Staff only see "My Profile"
+        return item.role === 'staff';
+    }
+    // Default to admin view if no role set (e.g., on server)
+    return item.role === 'admin' || item.href === '/profile';
+  });
+
 
   const isLinkActive = (href: string, isParent = false) => {
     if (isParent) {
       return pathname.startsWith(href);
+    }
+    if (href === '/profile') {
+        // Special handling for dynamic profile routes
+        return pathname.startsWith('/staff/');
     }
     return pathname === href;
   };
@@ -177,7 +224,7 @@ export function MainNav() {
           ) : (
             <SidebarMenuButton
               as={Link}
-              href={item.href!}
+              href={item.label === 'My Profile' ? getProfileLink() : item.href!}
               isActive={isLinkActive(item.href!)}
               tooltip={item.label}
             >

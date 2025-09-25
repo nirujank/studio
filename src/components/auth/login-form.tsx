@@ -15,18 +15,37 @@ import { Label } from '@/components/ui/label';
 import { useState, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { staffData } from '@/lib/data';
 
 export function LoginForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const emailRef = useRef<HTMLInputElement>(null);
+  const [selectedUser, setSelectedUser] = useState('admin');
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
+
+    // Simulate storing the user role
+    if (typeof window !== 'undefined') {
+        sessionStorage.setItem('userRole', selectedUser === 'admin' ? 'admin' : 'staff');
+        sessionStorage.setItem('userId', selectedUser);
+    }
+    
     // Simulate network request
     setTimeout(() => {
-      router.push('/dashboard');
+      if (selectedUser === 'admin') {
+        router.push('/dashboard');
+      } else {
+        router.push(`/staff/${selectedUser}`);
+      }
     }, 1000);
   };
 
@@ -36,20 +55,25 @@ export function LoginForm() {
         <CardHeader>
           <CardTitle className="font-headline text-2xl">Login</CardTitle>
           <CardDescription>
-            Enter your credentials to access your account.
+            Select a user to log in.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              defaultValue="admin@invorg.com"
-              required
-              ref={emailRef}
-            />
+            <Label htmlFor="user-select">Log in as</Label>
+            <Select value={selectedUser} onValueChange={setSelectedUser}>
+              <SelectTrigger id="user-select">
+                <SelectValue placeholder="Select a user" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="admin">Admin User</SelectItem>
+                {staffData.map(staff => (
+                  <SelectItem key={staff.id} value={staff.id}>
+                    {staff.name} (Staff)
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
@@ -61,14 +85,14 @@ export function LoginForm() {
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Sign In
           </Button>
-          <Button
+           <Button
             type="button"
             variant="link"
             size="sm"
             className="text-xs text-muted-foreground"
             asChild
           >
-            <Link href="/reset-password">Forgot your Password? Contact PCO for password reset</Link>
+            <Link href="/login">Forgot your Password? Contact PCO for password reset</Link>
           </Button>
         </CardFooter>
       </Card>

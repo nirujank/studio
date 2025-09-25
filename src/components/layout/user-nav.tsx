@@ -13,9 +13,36 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogOut, User } from 'lucide-react';
-import { currentUser } from '@/lib/data';
+import { currentUser as adminUser, staffData } from '@/lib/data';
+import { useEffect, useState } from 'react';
 
 export function UserNav() {
+  const [currentUser, setCurrentUser] = useState(adminUser);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const role = sessionStorage.getItem('userRole');
+        const userId = sessionStorage.getItem('userId');
+
+        if (role === 'staff' && userId) {
+            const staffUser = staffData.find(s => s.id === userId);
+            if (staffUser) {
+                setCurrentUser(staffUser);
+            }
+        } else {
+            setCurrentUser(adminUser);
+        }
+    }
+  }, []);
+
+
+  const handleLogout = () => {
+    if(typeof window !== 'undefined') {
+        sessionStorage.removeItem('userRole');
+        sessionStorage.removeItem('userId');
+    }
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -49,7 +76,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild onClick={handleLogout}>
           <Link href="/login">
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
