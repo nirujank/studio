@@ -16,6 +16,8 @@ import {
   UserCheck,
   CalendarCheck,
   FolderKanban,
+  Sparkles,
+  Briefcase,
 } from 'lucide-react';
 import {
   SidebarMenu,
@@ -40,9 +42,26 @@ const navItems = [
     label: 'Tenants',
   },
   {
-    href: '/staff',
-    icon: Users,
     label: 'Staff',
+    icon: Users,
+    href: '/staff',
+    subItems: [
+      {
+        href: '/staff',
+        icon: Users,
+        label: 'All Staff',
+      },
+      {
+        href: '/staff/skills',
+        icon: Sparkles,
+        label: 'Skills & Training',
+      },
+      {
+        href: '/staff/history',
+        icon: Briefcase,
+        label: 'Job History',
+      },
+    ],
   },
   {
     href: '/projects',
