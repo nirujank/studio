@@ -153,8 +153,8 @@ export function StaffTable({ staffData: initialStaffData }: StaffTableProps) {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Tenant</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Region</TableHead>
+              <TableHead>Job Title</TableHead>
+              <TableHead>Home Office</TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
               </TableHead>
@@ -182,10 +182,10 @@ export function StaffTable({ staffData: initialStaffData }: StaffTableProps) {
                   <div className="font-medium">{member.tenantName}</div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="secondary">{member.category}</Badge>
+                  {member.jobTitle}
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline">{member.region}</Badge>
+                  {member.homeOffice}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
