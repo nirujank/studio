@@ -7,6 +7,10 @@ import { projectData } from '@/lib/data';
 import { useState, useEffect } from 'react';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { PlusCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+
 
 export type TimesheetEntry = {
   id: string;
@@ -21,6 +25,7 @@ export type TimesheetEntry = {
 export default function E6Page() {
   const [userId, setUserId] = useState<string | null>(null);
   const [entries, setEntries] = useState<TimesheetEntry[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -33,6 +38,7 @@ export default function E6Page() {
 
   const handleEntryAdded = (newEntry: Omit<TimesheetEntry, 'id'>) => {
     setEntries(prev => [...prev, { ...newEntry, id: Date.now().toString() }]);
+    setIsDialogOpen(false);
   };
   
   const currentWeekEntries = entries.filter(entry => {
@@ -44,59 +50,69 @@ export default function E6Page() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold font-headline">E6 Timesheet</h1>
-          <p className="text-muted-foreground">Log your daily work hours.</p>
+        <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold font-headline">E6 Timesheet</h1>
+              <p className="text-muted-foreground">Log your daily work hours.</p>
+            </div>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Log Time
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Log Time</DialogTitle>
+                  <DialogDescription>Enter your work details for a specific day.</DialogDescription>
+                </DialogHeader>
+                <E6TimesheetForm userId={userId} onEntryAdded={handleEntryAdded} />
+              </DialogContent>
+            </Dialog>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1">
-            <E6TimesheetForm userId={userId} onEntryAdded={handleEntryAdded} />
-          </div>
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>This Week's Entries</CardTitle>
-                <CardDescription>A summary of hours logged this week.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Project</TableHead>
-                      <TableHead>Hours</TableHead>
-                      <TableHead>Pay Type</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {currentWeekEntries.length > 0 ? (
-                      currentWeekEntries.map(entry => {
-                        const project = projectData.find(p => p.id === entry.projectId);
-                        return (
-                          <TableRow key={entry.id}>
-                            <TableCell>{format(entry.date, 'PPP')}</TableCell>
-                            <TableCell>{project?.name || 'N/A'}</TableCell>
-                            <TableCell>{entry.hours}</TableCell>
-                            <TableCell>
-                              <Badge variant={entry.payType === 'Overtime' ? 'destructive' : 'secondary'}>{entry.payType}</Badge>
-                            </TableCell>
-                          </TableRow>
-                        )
-                      })
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={4} className="text-center text-muted-foreground">
-                          No entries for this week.
+        <Card>
+          <CardHeader>
+            <CardTitle>This Week's Entries</CardTitle>
+            <CardDescription>A summary of hours logged this week.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Project</TableHead>
+                  <TableHead>Hours</TableHead>
+                  <TableHead>Pay Type</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {currentWeekEntries.length > 0 ? (
+                  currentWeekEntries.map(entry => {
+                    const project = projectData.find(p => p.id === entry.projectId);
+                    return (
+                      <TableRow key={entry.id}>
+                        <TableCell>{format(entry.date, 'PPP')}</TableCell>
+                        <TableCell>{project?.name || 'N/A'}</TableCell>
+                        <TableCell>{entry.hours}</TableCell>
+                        <TableCell>
+                          <Badge variant={entry.payType === 'Overtime' ? 'destructive' : 'secondary'}>{entry.payType}</Badge>
                         </TableCell>
                       </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+                    )
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center text-muted-foreground">
+                      No entries for this week.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       </div>
     </AppLayout>
   );

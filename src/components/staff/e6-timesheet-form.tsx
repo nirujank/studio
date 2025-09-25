@@ -1,5 +1,4 @@
 'use client';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,7 +8,7 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { projectData } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 
 type TimesheetEntry = {
   id: string;
@@ -81,78 +80,70 @@ export function E6TimesheetForm({ userId, onEntryAdded }: E6TimesheetFormProps) 
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Log Time</CardTitle>
-          <CardDescription>Enter your work details for a specific day.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="date">Date</Label>
+        <DatePicker name="date" />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="projectId">Project Name</Label>
+        <Select name="projectId" required onValueChange={setSelectedProject}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a project" />
+          </SelectTrigger>
+          <SelectContent>
+            {userProjects.map(project => (
+              <SelectItem key={project.id} value={project.id}>
+                {project.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="milestone">Project Milestone</Label>
+        <Select name="milestone" required disabled={!selectedProject}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a milestone" />
+          </SelectTrigger>
+          <SelectContent>
+            {projectMilestones.map(milestone => (
+              <SelectItem key={milestone.name} value={milestone.name}>
+                {milestone.name} ({milestone.status})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="date">Date</Label>
-            <DatePicker name="date" />
-          </div>
+          <Label htmlFor="hours">Hours</Label>
+          <Input id="hours" name="hours" type="number" step="0.5" min="0" required />
+        </div>
           <div className="space-y-2">
-            <Label htmlFor="projectId">Project Name</Label>
-            <Select name="projectId" required onValueChange={setSelectedProject}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a project" />
-              </SelectTrigger>
-              <SelectContent>
-                {userProjects.map(project => (
-                  <SelectItem key={project.id} value={project.id}>
-                    {project.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="milestone">Project Milestone</Label>
-            <Select name="milestone" required disabled={!selectedProject}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a milestone" />
-              </SelectTrigger>
-              <SelectContent>
-                {projectMilestones.map(milestone => (
-                  <SelectItem key={milestone.name} value={milestone.name}>
-                    {milestone.name} ({milestone.status})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-             <div className="space-y-2">
-              <Label htmlFor="hours">Hours</Label>
-              <Input id="hours" name="hours" type="number" step="0.5" min="0" required />
-            </div>
-             <div className="space-y-2">
-              <Label htmlFor="payType">Pay Type</Label>
-              <Select name="payType" required defaultValue="Regular">
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Regular">Regular</SelectItem>
-                  <SelectItem value="Overtime">Overtime</SelectItem>
-                  <SelectItem value="Holiday">Holiday</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea id="description" name="description" placeholder="Describe the work done..." />
-          </div>
-        </CardContent>
-        <CardFooter>
+          <Label htmlFor="payType">Pay Type</Label>
+          <Select name="payType" required defaultValue="Regular">
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Regular">Regular</SelectItem>
+              <SelectItem value="Overtime">Overtime</SelectItem>
+              <SelectItem value="Holiday">Holiday</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="description">Description</Label>
+        <Textarea id="description" name="description" placeholder="Describe the work done..." />
+      </div>
+       <div className="pt-4">
           <Button type="submit" className="w-full">
             <Save className="mr-2 h-4 w-4" />
             Save Entry
           </Button>
-        </CardFooter>
-      </Card>
+      </div>
     </form>
   );
 }
