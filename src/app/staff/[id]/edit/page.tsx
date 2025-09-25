@@ -1,13 +1,17 @@
+
+'use client';
 import { AppLayout } from '@/components/layout/app-layout';
 import { StaffForm } from '@/components/staff/staff-form';
 import { staffData } from '@/lib/data';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 
-export default function EditStaffPage({ params }: { params: { id: string } }) {
-  const staffMember = staffData.find(s => s.id === params.id);
+export default function EditStaffPage() {
+  const params = useParams();
+  const id = params.id as string;
+  const staffMember = staffData.find(s => s.id === id);
 
   if (!staffMember) {
     notFound();

@@ -1,14 +1,17 @@
 
+'use client';
 import { AppLayout } from '@/components/layout/app-layout';
 import { ProjectForm } from '@/components/projects/project-form';
 import { projectData } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 
-export default function EditProjectPage({ params }: { params: { id: string } }) {
-  const project = projectData.find((p) => p.id === params.id);
+export default function EditProjectPage() {
+  const params = useParams();
+  const id = params.id as string;
+  const project = projectData.find((p) => p.id === id);
 
   if (!project) {
     notFound();

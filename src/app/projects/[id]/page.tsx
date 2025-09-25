@@ -1,10 +1,12 @@
+
+'use client';
 import { AppLayout } from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { projectData } from '@/lib/data';
 import { ChevronLeft, Pencil } from 'lucide-react';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -18,8 +20,10 @@ const DetailItem = ({ label, value }: { label: string; value: React.ReactNode })
     ) : null
 );
 
-export default function ProjectDetailPage({ params }: { params: { id: string } }) {
-  const project = projectData.find(p => p.id === params.id);
+export default function ProjectDetailPage() {
+  const params = useParams();
+  const id = params.id as string;
+  const project = projectData.find(p => p.id === id);
 
   if (!project) {
     notFound();

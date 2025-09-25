@@ -17,11 +17,13 @@ import Link from 'next/link';
 import { currentUser as defaultUser } from '@/lib/data';
 import { useNotifications } from '@/hooks/use-notifications';
 import { useToast } from '@/hooks/use-toast';
+import { useParams } from 'next/navigation';
 
-export default function ProfilePage({ params }: { params: { id: string } }) {
+export default function ProfilePage() {
   const { addNotification } = useNotifications();
   const { toast } = useToast();
-  const { id } = params;
+  const params = useParams();
+  const id = params.id as string;
   
   // A temporary hack to allow `/profile` to work for the current user link in the top nav
   if (id === 'profile') {
