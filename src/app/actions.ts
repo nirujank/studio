@@ -7,7 +7,7 @@ import { calculateProjectFitScore } from '@/ai/flows/calculate-project-fit-score
 import { extractProjectInfoFromBrd } from '@/ai/flows/extract-project-info-from-brd';
 import { assessLeaveRequest } from '@/ai/flows/assess-leave-request';
 import { z } from 'zod';
-import { staffData } from '@/lib/data';
+import { staffData, projectData } from '@/lib/data';
 import { differenceInDays } from 'date-fns';
 
 const skillsSchema = z.object({
@@ -188,8 +188,8 @@ export async function extractProjectInfoAction(
 }
 
 const leaveRequestSchema = z.object({
-  staffId: z.string().min(1),
-  leaveType: z.enum(['sick', 'vacation', 'personal']),
+  staffId: z.string().min(1, 'Staff member is required.'),
+  leaveType: z.enum(['sick', 'vacation', 'personal'], { required_error: 'Leave type is required.' }),
   startDate: z.string().min(1, 'Start date is required.'),
   endDate: z.string().min(1, 'End date is required.'),
 }).refine(data => new Date(data.endDate) >= new Date(data.startDate), {
