@@ -68,7 +68,7 @@ export function Combobox({
                   key={option.value}
                   value={option.label}
                   onSelect={(currentValue) => {
-                    const newValue = options.find(o => o.label.toLowerCase() === currentValue)?.value || '';
+                    const newValue = options.find(o => o.label.toLowerCase() === currentValue.toLowerCase())?.value || '';
                     onSelect(newValue === selectedValue ? '' : newValue);
                     setOpen(false);
                   }}
@@ -89,5 +89,3 @@ export function Combobox({
     </Popover>
   );
 }
-
-    
