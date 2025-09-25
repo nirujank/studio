@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -23,6 +24,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -35,7 +37,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { MoreHorizontal, UserPlus, Search } from 'lucide-react';
+import { MoreHorizontal, UserPlus, Search, UserX, UserCheck } from 'lucide-react';
 import type { StaffMember } from '@/lib/data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -47,15 +49,17 @@ type StaffTableProps = {
   staffData: StaffMember[];
 };
 
-export function StaffTable({ staffData }: StaffTableProps) {
+export function StaffTable({ staffData: initialStaffData }: StaffTableProps) {
+  const [staff, setStaff] = useState(initialStaffData);
   const [search, setSearch] = useState('');
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
+  const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<StaffMember | null>(null);
   const { toast } = useToast();
   const router = useRouter();
   const { addNotification } = useNotifications();
 
-  const filteredData = staffData.filter(
+  const filteredData = staff.filter(
     (member) =>
       member.name.toLowerCase().includes(search.toLowerCase()) ||
       member.email.toLowerCase().includes(search.toLowerCase()) ||
@@ -81,6 +85,28 @@ export function StaffTable({ staffData }: StaffTableProps) {
       });
     }
     setResetDialogOpen(false);
+    setSelectedUser(null);
+  };
+
+  const handleDeactivate = (user: StaffMember) => {
+    setSelectedUser(user);
+    setDeactivateDialogOpen(true);
+  };
+
+  const confirmDeactivate = () => {
+    if (selectedUser) {
+      const isDeactivating = selectedUser.status === 'Active';
+      setStaff(staff.map(member => 
+        member.id === selectedUser.id 
+          ? { ...member, status: isDeactivating ? 'Deactivated' : 'Active' } 
+          : member
+      ));
+      toast({
+        title: `User ${isDeactivating ? 'Deactivated' : 'Reactivated'}`,
+        description: `${selectedUser.name}'s account has been ${isDeactivating ? 'deactivated' : 'reactivated'}.`,
+      });
+    }
+    setDeactivateDialogOpen(false);
     setSelectedUser(null);
   }
 
@@ -136,7 +162,7 @@ export function StaffTable({ staffData }: StaffTableProps) {
           </TableHeader>
           <TableBody>
             {filteredData.map((member) => (
-              <TableRow key={member.id}>
+              <TableRow key={member.id} className={member.status === 'Deactivated' ? 'opacity-50' : ''}>
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar className="h-9 w-9">
@@ -145,6 +171,7 @@ export function StaffTable({ staffData }: StaffTableProps) {
                     </Avatar>
                     <div className="font-medium">
                       {member.name}
+                      {member.status === 'Deactivated' && <Badge variant="destructive" className="ml-2">Deactivated</Badge>}
                       <div className="text-sm text-muted-foreground">
                         {member.email}
                       </div>
@@ -176,6 +203,23 @@ export function StaffTable({ staffData }: StaffTableProps) {
                       <DropdownMenuItem onSelect={() => handleResetPassword(member)}>
                         Reset Password
                       </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onSelect={() => handleDeactivate(member)}
+                        className={member.status === 'Active' ? 'text-destructive focus:bg-destructive/10 focus:text-destructive' : 'text-green-600 focus:bg-green-600/10 focus:text-green-700'}
+                      >
+                         {member.status === 'Active' ? (
+                          <>
+                            <UserX className="mr-2 h-4 w-4" />
+                            Deactivate User
+                          </>
+                        ) : (
+                          <>
+                            <UserCheck className="mr-2 h-4 w-4" />
+                            Reactivate User
+                          </>
+                        )}
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
@@ -190,6 +234,7 @@ export function StaffTable({ staffData }: StaffTableProps) {
         )}
       </CardContent>
     </Card>
+
     <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -201,6 +246,27 @@ export function StaffTable({ staffData }: StaffTableProps) {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmResetPassword}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={deactivateDialogOpen} onOpenChange={setDeactivateDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will {selectedUser?.status === 'Active' ? 'deactivate' : 'reactivate'} the account for {selectedUser?.name}. 
+              They {selectedUser?.status === 'Active' ? 'will lose access' : 'will regain access'} to the platform.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+                onClick={confirmDeactivate}
+                className={selectedUser?.status === 'Active' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : ''}
+            >
+              {selectedUser?.status === 'Active' ? 'Deactivate' : 'Reactivate'}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

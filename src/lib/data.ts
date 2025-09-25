@@ -14,6 +14,7 @@ export type StaffMember = {
   contractualOffice: string;
   tenantId: string;
   tenantName: string;
+  status: 'Active' | 'Deactivated';
   profile: {
     personal: {
       phone: string;
@@ -74,6 +75,7 @@ export const staffData: StaffMember[] = [
     contractualOffice: 'San Francisco, CA',
     tenantId: 'TEN-001',
     tenantName: 'Innovate Corp',
+    status: 'Active',
     profile: {
       personal: {
         phone: '123-456-7890',
@@ -146,6 +148,7 @@ export const staffData: StaffMember[] = [
     contractualOffice: 'London, UK',
     tenantId: 'TEN-002',
     tenantName: 'Global Solutions',
+    status: 'Active',
     profile: {
       personal: {
         phone: '+44 20 7946 0958',
@@ -206,6 +209,7 @@ export const staffData: StaffMember[] = [
     contractualOffice: 'Singapore',
     tenantId: 'TEN-001',
     tenantName: 'Innovate Corp',
+    status: 'Active',
     profile: {
       personal: {
         phone: '+65 9123 4567',
@@ -259,6 +263,7 @@ export const staffData: StaffMember[] = [
     contractualOffice: 'New York, NY',
     tenantId: 'TEN-002',
     tenantName: 'Global Solutions',
+    status: 'Active',
     profile: {
       personal: {
         phone: '987-654-3210',
@@ -312,6 +317,7 @@ export const staffData: StaffMember[] = [
     contractualOffice: 'Remote',
     tenantId: 'TEN-003',
     tenantName: 'Creative Minds Inc.',
+    status: 'Active',
     profile: {
       personal: {
         phone: '+49 30 12345678',
