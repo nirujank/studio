@@ -4,6 +4,7 @@
 import { extractSkillsFromResume } from '@/ai/flows/extract-skills-from-resume';
 import { extractInfoFromResume } from '@/ai/flows/extract-info-from-resume';
 import { calculateProjectFitScore } from '@/ai/flows/calculate-project-fit-score';
+import { extractProjectInfoFromBrd } from '@/ai/flows/extract-project-info-from-brd';
 import { z } from 'zod';
 import { staffData } from '@/lib/data';
 
@@ -137,3 +138,49 @@ export async function getFitScoreAction(
   }
 }
 
+
+const projectInfoSchema = z.object({
+  brd: z.any(),
+});
+
+export type ProjectInfoState = {
+  data?: any;
+  error?: string;
+};
+
+export async function extractProjectInfoAction(
+  prevState: ProjectInfoState,
+  formData: FormData
+): Promise<ProjectInfoState> {
+  try {
+    const validatedFields = projectInfoSchema.safeParse({
+      brd: formData.get('brd'),
+    });
+
+    if (!validatedFields.success) {
+      return { error: 'Invalid BRD file.' };
+    }
+    
+    const file = formData.get('brd') as File;
+    if (!file || file.size === 0) {
+      return { error: 'Please upload a BRD file.' };
+    }
+
+    const buffer = await file.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString('base64');
+    const dataUri = `data:${file.type};base64,${base64}`;
+
+    const result = await extractProjectInfoFromBrd({
+      brdDataUri: dataUri,
+    });
+    
+    if (result) {
+      return { data: result };
+    } else {
+      return { error: "Couldn't extract any information from the BRD. Try a different file." };
+    }
+  } catch (e) {
+    console.error(e);
+    return { error: 'An unexpected error occurred. Please try again.' };
+  }
+}

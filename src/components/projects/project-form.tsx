@@ -25,7 +25,7 @@ import { useRouter } from 'next/navigation';
 import { Save, PlusCircle, Trash2, Sparkles, Loader2, Info } from 'lucide-react';
 import { Textarea } from '../ui/textarea';
 import { DatePicker } from '../ui/date-picker';
-import React, { useState, useTransition } from 'react';
+import React, { useState, useTransition, useEffect } from 'react';
 import { getFitScoreAction } from '@/app/actions';
 import type { CalculateProjectFitScoreOutput } from '@/ai/flows/calculate-project-fit-score';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
@@ -33,7 +33,7 @@ import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
 
 type ProjectFormProps = {
-  project?: Project;
+  project?: Project | Partial<Project>;
 };
 
 type Resource = {
@@ -49,19 +49,33 @@ type FitScoreResult = (CalculateProjectFitScoreOutput & { userId: string }) | nu
 export function ProjectForm({ project }: ProjectFormProps) {
   const { toast } = useToast();
   const router = useRouter();
-  const isEditMode = !!project;
+  const isEditMode = !!project && 'id' in project;
+
+  const [formData, setFormData] = useState({
+    name: project?.name || '',
+    code: project?.code || '',
+    version: project?.version || '',
+    owner: project?.owner || '',
+    manager: project?.manager || '',
+    tenantId: 'tenantId' in project ? project.tenantId : '',
+  });
 
   const [techStack, setTechStack] = useState({
-    languages: project?.techStack.languages.join(', ') || '',
-    frameworks: project?.techStack.frameworks.join(', ') || '',
-    databases: project?.techStack.databases.join(', ') || '',
-    cloudProvider: project?.techStack.cloudProvider || '',
-    integrations: project?.techStack.integrations.join(', ') || '',
-    devOps: project?.techStack.devOps.join(', ') || '',
+    languages: project?.techStack?.languages?.join(', ') || '',
+    frameworks: project?.techStack?.frameworks?.join(', ') || '',
+    databases: project?.techStack?.databases?.join(', ') || '',
+    cloudProvider: project?.techStack?.cloudProvider || '',
+    integrations: project?.techStack?.integrations?.join(', ') || '',
+    devOps: project?.techStack?.devOps?.join(', ') || '',
+  });
+  
+  const [timeline, setTimeline] = useState({
+    startDate: project?.timeline?.startDate ? new Date(project.timeline.startDate) : undefined,
+    endDate: project?.timeline?.endDate ? new Date(project.timeline.endDate) : undefined,
   });
 
   const initialResources =
-    project?.resources.teamMembers.map((tm) => ({
+    project?.resources?.teamMembers?.map((tm) => ({
       id: tm.userId + Date.now(), // simple unique id
       userId: tm.userId,
       role: tm.role,
@@ -71,6 +85,32 @@ export function ProjectForm({ project }: ProjectFormProps) {
   const [resources, setResources] = useState<Resource[]>(initialResources);
   const [isCheckingFit, startFitCheck] = useTransition();
   const [fitScores, setFitScores] = useState<Record<string, FitScoreResult>>({});
+
+  useEffect(() => {
+    if (project) {
+        setFormData({
+            name: project.name || '',
+            code: 'code' in project ? project.code : '',
+            version: 'version' in project ? project.version : '',
+            owner: project.owner || '',
+            manager: project.manager || '',
+            tenantId: 'tenantId' in project ? project.tenantId : '',
+        });
+        setTechStack({
+            languages: project.techStack?.languages?.join(', ') || '',
+            frameworks: project.techStack?.frameworks?.join(', ') || '',
+            databases: project.techStack?.databases?.join(', ') || '',
+            cloudProvider: project.techStack?.cloudProvider || '',
+            integrations: project.techStack?.integrations?.join(', ') || '',
+            devOps: project.techStack?.devOps?.join(', ') || '',
+        });
+        setTimeline({
+            startDate: project.timeline?.startDate ? new Date(project.timeline.startDate) : undefined,
+            endDate: project.timeline?.endDate ? new Date(project.timeline.endDate) : undefined,
+        });
+    }
+  }, [project]);
+
 
   const handleAddResource = () => {
     setResources([
@@ -143,8 +183,8 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const name = formData.get('name') as string;
+    const formElData = new FormData(event.currentTarget);
+    const name = formElData.get('name') as string;
 
     toast({
       title: isEditMode ? 'Project Updated' : 'Project Added',
@@ -170,7 +210,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
             <CardContent className="grid sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="name">Project Name</Label>
-                <Input id="name" name="name" defaultValue={project?.name} required />
+                <Input id="name" name="name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="code">Project Code</Label>
@@ -178,7 +218,8 @@ export function ProjectForm({ project }: ProjectFormProps) {
                   id="code"
                   name="code"
                   type="text"
-                  defaultValue={project?.code}
+                  value={formData.code}
+                  onChange={(e) => setFormData({...formData, code: e.target.value})}
                   required
                 />
               </div>
@@ -188,21 +229,22 @@ export function ProjectForm({ project }: ProjectFormProps) {
                   id="version"
                   name="version"
                   type="text"
-                  defaultValue={project?.version}
+                  value={formData.version}
+                  onChange={(e) => setFormData({...formData, version: e.target.value})}
                   required
                 />
               </div>
                <div className="space-y-2">
                 <Label htmlFor="owner">Project Owner</Label>
-                <Input id="owner" name="owner" defaultValue={project?.owner} />
+                <Input id="owner" name="owner" value={formData.owner} onChange={(e) => setFormData({...formData, owner: e.target.value})} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="manager">Project Manager</Label>
-                <Input id="manager" name="manager" defaultValue={project?.manager} required />
+                <Input id="manager" name="manager" value={formData.manager} onChange={(e) => setFormData({...formData, manager: e.target.value})} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="tenantId">Tenant</Label>
-                <Select name="tenantId" defaultValue={project?.tenantId}>
+                <Select name="tenantId" value={formData.tenantId} onValueChange={(value) => setFormData({...formData, tenantId: value})}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select tenant" />
                   </SelectTrigger>
@@ -386,19 +428,19 @@ export function ProjectForm({ project }: ProjectFormProps) {
             <CardContent className="grid sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="startDate">Start Date</Label>
-                <DatePicker name="startDate" />
+                <DatePicker name="startDate" defaultValue={timeline.startDate} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="endDate">Target Completion Date</Label>
-                <DatePicker name="endDate" />
+                <DatePicker name="endDate" defaultValue={timeline.endDate} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="estimatedHours">Estimated Effort (hours)</Label>
-                <Input id="estimatedHours" name="estimatedHours" type="number" placeholder="e.g., 800" />
+                <Input id="estimatedHours" name="estimatedHours" type="number" placeholder="e.g., 800" defaultValue={project?.timeline?.estimatedHours} />
               </div>
                <div className="space-y-2">
                 <Label htmlFor="milestones">Milestones</Label>
-                <Textarea id="milestones" name="milestones" placeholder="e.g., MVP Launch (YYYY-MM-DD), UAT, Go-Live" />
+                <Textarea id="milestones" name="milestones" placeholder="e.g., MVP Launch (YYYY-MM-DD), UAT, Go-Live" defaultValue={project?.timeline?.milestones?.map(m => `${m.name} (${m.date})`).join('\n')} />
               </div>
             </CardContent>
           </Card>
@@ -410,15 +452,15 @@ export function ProjectForm({ project }: ProjectFormProps) {
             <CardContent className="grid sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="bugTrackerUrl">Bug Tracking Tool URL</Label>
-                <Input id="bugTrackerUrl" name="bugTrackerUrl" placeholder="https://jira.example.com" />
+                <Input id="bugTrackerUrl" name="bugTrackerUrl" placeholder="https://jira.example.com" defaultValue={'support' in project ? project.support?.bugTrackerUrl : ''} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="sla">Support SLA</Label>
-                <Input id="sla" name="sla" placeholder="e.g., 24-hour response" />
+                <Input id="sla" name="sla" placeholder="e.g., 24-hour response" defaultValue={'support' in project ? project.support?.sla : ''} />
               </div>
                <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="escalationContacts">Escalation Contacts</Label>
-                <Input id="escalationContacts" name="escalationContacts" placeholder="e.g., Manager Name, Lead Engineer Name" />
+                <Input id="escalationContacts" name="escalationContacts" placeholder="e.g., Manager Name, Lead Engineer Name" defaultValue={'support' in project ? project.support?.escalationContacts.join(', ') : ''} />
               </div>
             </CardContent>
           </Card>
@@ -430,15 +472,15 @@ export function ProjectForm({ project }: ProjectFormProps) {
             <CardContent className="grid sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="architectureUrl">Architecture Docs URL</Label>
-                <Input id="architectureUrl" name="architectureUrl" />
+                <Input id="architectureUrl" name="architectureUrl" defaultValue={'documentation' in project ? project.documentation?.architectureUrl : ''}/>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="apiUrl">API Docs URL</Label>
-                <Input id="apiUrl" name="apiUrl" />
+                <Input id="apiUrl" name="apiUrl" defaultValue={'documentation' in project ? project.documentation?.apiUrl : ''} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="wikiUrl">Knowledge Base / Wiki URL</Label>
-                <Input id="wikiUrl" name="wikiUrl" />
+                <Input id="wikiUrl" name="wikiUrl" defaultValue={'documentation' in project ? project.documentation?.wikiUrl : ''}/>
               </div>
             </CardContent>
           </Card>
@@ -450,7 +492,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
             <CardContent className="grid gap-6">
                 <div className="space-y-2">
                     <Label htmlFor="risks">Key Risks & Mitigation</Label>
-                    <Textarea id="risks" name="risks" placeholder="Describe key risks and their mitigation plans." />
+                    <Textarea id="risks" name="risks" placeholder="Describe key risks and their mitigation plans." defaultValue={'risks' in project ? project.risks?.map(r => r.description).join('\n') : ''} />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="dependencies">Dependencies</Label>
@@ -466,15 +508,15 @@ export function ProjectForm({ project }: ProjectFormProps) {
             <CardContent className="grid sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
                     <Label htmlFor="estimatedCost">Estimated Cost ($)</Label>
-                    <Input id="estimatedCost" name="estimatedCost" type="number" placeholder="e.g., 50000" />
+                    <Input id="estimatedCost" name="estimatedCost" type="number" placeholder="e.g., 50000" defaultValue={project?.financials?.estimatedCost} />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="licensingCost">Licensing Costs ($)</Label>
-                    <Input id="licensingCost" name="licensingCost" type="number" placeholder="e.g., 2000" />
+                    <Input id="licensingCost" name="licensingCost" type="number" placeholder="e.g., 2000" defaultValue={project?.financials?.licensingCost} />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="budgetOwner">Budget Owner</Label>
-                    <Input id="budgetOwner" name="budgetOwner" placeholder="e.g., Finance Dept" />
+                    <Input id="budgetOwner" name="budgetOwner" placeholder="e.g., Finance Dept" defaultValue={project?.financials?.budgetOwner} />
                 </div>
             </CardContent>
           </Card>
