@@ -3,15 +3,20 @@ import { useState, useRef, useEffect, useTransition } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, Send, Loader2, User, Bot } from 'lucide-react';
+import { X, Send, Loader2, User, Bot, LinkIcon } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { chatbotAction } from '@/app/actions';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 import { currentUser as adminUser, staffData } from '@/lib/data';
+import Link from 'next/link';
 
 type Message = {
   role: 'user' | 'model';
   content: string;
+  link?: {
+    text: string;
+    href: string;
+  }
 };
 
 type ChatWindowProps = {
@@ -66,7 +71,7 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
       if (result.error) {
         setMessages(prev => [...prev, { role: 'model', content: result.error! }]);
       } else if (result.data) {
-        setMessages(prev => [...prev, { role: 'model', content: result.data.response }]);
+        setMessages(prev => [...prev, { role: 'model', content: result.data.response, link: result.data.link }]);
       }
     });
   };
@@ -95,13 +100,21 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
                   </Avatar>
                 )}
                 <div
-                  className={`rounded-lg px-3 py-2 text-sm max-w-[80%] ${
+                  className={`rounded-lg px-3 py-2 text-sm max-w-[80%] space-y-2 ${
                     message.role === 'user'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted'
                   }`}
                 >
-                  {message.content}
+                  <p>{message.content}</p>
+                  {message.link && (
+                    <Button asChild variant="secondary" size="sm" className="w-full">
+                      <Link href={message.link.href}>
+                        <LinkIcon className="mr-2 h-4 w-4" />
+                        {message.link.text}
+                      </Link>
+                    </Button>
+                  )}
                 </div>
                  {message.role === 'user' && (
                   <Avatar className="h-8 w-8">

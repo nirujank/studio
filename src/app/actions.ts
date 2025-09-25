@@ -6,7 +6,7 @@ import { extractInfoFromResume } from '@/ai/flows/extract-info-from-resume';
 import { calculateProjectFitScore } from '@/ai/flows/calculate-project-fit-score';
 import { extractProjectInfoFromBrd } from '@/ai/flows/extract-project-info-from-brd';
 import { assessLeaveRequest } from '@/ai/flows/assess-leave-request';
-import { runChatbotFlow, type ChatbotInput } from '@/ai/flows/chatbot-flow';
+import { runChatbotFlow, type ChatbotInput, type ChatbotOutput } from '@/ai/flows/chatbot-flow';
 import { z } from 'zod';
 import { staffData, projectData } from '@/lib/data';
 import { differenceInDays } from 'date-fns';
@@ -257,7 +257,7 @@ export async function chatbotAction(
   userId: string,
   userRole: 'admin' | 'staff',
   history: any[]
-) {
+): Promise<{ data?: ChatbotOutput; error?: string; }> {
   try {
     const validatedFields = ChatbotActionSchema.safeParse({
       query,
