@@ -4,8 +4,8 @@ import { E6TimesheetForm } from '@/components/staff/e6-timesheet-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { projectData } from '@/lib/data';
-import { useState, useEffect } from 'react';
-import { format, startOfWeek, endOfWeek } from 'date-fns';
+import { useState, useEffect, useMemo } from 'react';
+import { format, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
@@ -41,11 +41,13 @@ export default function E6Page() {
     setIsDialogOpen(false);
   };
   
-  const currentWeekEntries = entries.filter(entry => {
+  const currentWeekEntries = useMemo(() => {
     const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
     const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 });
-    return entry.date >= weekStart && entry.date <= weekEnd;
-  });
+    return entries.filter(entry => 
+        isWithinInterval(entry.date, { start: weekStart, end: weekEnd })
+    );
+  }, [entries]);
 
   return (
     <AppLayout>
