@@ -31,6 +31,7 @@ import type { CalculateProjectFitScoreOutput } from '@/ai/flows/calculate-projec
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
+import { Combobox } from '../ui/combobox';
 
 type ProjectFormProps = {
   project?: Project | Partial<Project> | null;
@@ -201,6 +202,9 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
     router.push('/projects');
   };
+  
+  const tenantOptions = tenantData.map(tenant => ({ value: tenant.id, label: tenant.name }));
+  const staffOptions = staffData.map(staff => ({ value: staff.id, label: staff.name }));
 
   return (
     <form onSubmit={handleSubmit}>
@@ -250,18 +254,14 @@ export function ProjectForm({ project }: ProjectFormProps) {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="tenantId">Tenant</Label>
-                <Select name="tenantId" value={formData.tenantId} onValueChange={(value) => setFormData({...formData, tenantId: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select tenant" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {tenantData.map((tenant: Tenant) => (
-                      <SelectItem key={tenant.id} value={tenant.id}>
-                        {tenant.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Combobox
+                  options={tenantOptions}
+                  selectedValue={formData.tenantId}
+                  onSelect={(value) => setFormData({...formData, tenantId: value})}
+                  placeholder="Select tenant"
+                  searchPlaceholder="Search tenants..."
+                  notFoundText="No tenant found."
+                />
               </div>
             </CardContent>
           </Card>
@@ -316,22 +316,14 @@ export function ProjectForm({ project }: ProjectFormProps) {
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center">
                     <div className="md:col-span-4 space-y-1">
                       <Label htmlFor={`resource-user-${resource.id}`} className="text-xs">Staff Member</Label>
-                      <Select
-                        name={`resource_user_${resource.id}`}
-                        value={resource.userId}
-                        onValueChange={(value) => handleResourceChange(resource.id, 'userId', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select staff member" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {staffData.map((staff: StaffMember) => (
-                            <SelectItem key={staff.id} value={staff.id}>
-                              {staff.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Combobox
+                        options={staffOptions}
+                        selectedValue={resource.userId}
+                        onSelect={(value) => handleResourceChange(resource.id, 'userId', value)}
+                        placeholder="Select staff"
+                        searchPlaceholder="Search staff..."
+                        notFoundText="No staff found."
+                      />
                     </div>
                     <div className="md:col-span-3 space-y-1">
                       <Label htmlFor={`resource-role-${resource.id}`} className="text-xs">Role</Label>
@@ -546,3 +538,5 @@ export function ProjectForm({ project }: ProjectFormProps) {
     </form>
   );
 }
+
+    

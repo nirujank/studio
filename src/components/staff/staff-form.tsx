@@ -14,19 +14,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import React, { useState, useCallback, useId } from 'react';
 import { ResumeUploader } from './resume-uploader';
 import type { ExtractInfoFromResumeOutput } from '@/ai/flows/extract-info-from-resume';
 import { PlusCircle, Trash2 } from 'lucide-react';
+import { Combobox } from '../ui/combobox';
 
 type StaffFormProps = {
   staffMember?: StaffMember;
@@ -34,6 +28,30 @@ type StaffFormProps = {
 
 type EducationEntry = { id: string; degree: string; university: string; year?: number };
 type ExperienceEntry = { id: string; position: string; company: string; startDate?: string; endDate?: string; summary?: string };
+
+const employmentCategories = [
+    { value: 'Full-time', label: 'Full-time' },
+    { value: 'Part-time', label: 'Part-time' },
+    { value: 'Contract', label: 'Contract' },
+];
+
+const jobCategories = [
+    { value: 'Engineering', label: 'Engineering' },
+    { value: 'Design', label: 'Design' },
+    { value: 'Product', label: 'Product' },
+    { value: 'PCO', label: 'PCO' },
+    { value: 'Marketing', label: 'Marketing' },
+];
+
+const regions = [
+    { value: 'NA', label: 'NA' },
+    { value: 'EMEA', label: 'EMEA' },
+    { value: 'APAC', label: 'APAC' },
+    { value: 'LATAM', label: 'LATAM' },
+    { value: 'Central', label: 'Central' },
+    { value: 'Eastern', label: 'Eastern' },
+];
+
 
 export function StaffForm({ staffMember }: StaffFormProps) {
   const { toast } = useToast();
@@ -126,6 +144,8 @@ export function StaffForm({ staffMember }: StaffFormProps) {
 
     router.push('/staff');
   };
+  
+  const tenantOptions = tenantData.map(tenant => ({ value: tenant.id, label: tenant.name }));
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -166,45 +186,37 @@ export function StaffForm({ staffMember }: StaffFormProps) {
             </CardHeader>
             <CardContent className="grid sm:grid-cols-2 gap-4">
                <div className="space-y-2">
-                <Label htmlFor="tenantId">Tenant</Label>
-                 <Select name="tenantId" value={formData.tenantId} onValueChange={(value) => handleSelectChange('tenantId', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select tenant" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {tenantData.map((tenant: Tenant) => (
-                        <SelectItem key={tenant.id} value={tenant.id}>{tenant.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>Tenant</Label>
+                <Combobox
+                  options={tenantOptions}
+                  selectedValue={formData.tenantId}
+                  onSelect={(value) => handleSelectChange('tenantId', value)}
+                  placeholder="Select tenant"
+                  searchPlaceholder="Search tenants..."
+                  notFoundText="No tenant found."
+                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="employmentCategory">Employment Category</Label>
-                 <Select name="employmentCategory" value={formData.employmentCategory} onValueChange={(value) => handleSelectChange('employmentCategory', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Full-time">Full-time</SelectItem>
-                    <SelectItem value="Part-time">Part-time</SelectItem>
-                    <SelectItem value="Contract">Contract</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>Employment Category</Label>
+                <Combobox
+                  options={employmentCategories}
+                  selectedValue={formData.employmentCategory}
+                  onSelect={(value) => handleSelectChange('employmentCategory', value)}
+                  placeholder="Select category"
+                  searchPlaceholder="Search categories..."
+                  notFoundText="No category found."
+                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="category">Job Category</Label>
-                 <Select name="category" value={formData.category} onValueChange={(value) => handleSelectChange('category', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select job category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Engineering">Engineering</SelectItem>
-                    <SelectItem value="Design">Design</SelectItem>
-                    <SelectItem value="Product">Product</SelectItem>
-                    <SelectItem value="PCO">PCO</SelectItem>
-                    <SelectItem value="Marketing">Marketing</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>Job Category</Label>
+                 <Combobox
+                  options={jobCategories}
+                  selectedValue={formData.category}
+                  onSelect={(value) => handleSelectChange('category', value)}
+                  placeholder="Select job category"
+                  searchPlaceholder="Search categories..."
+                  notFoundText="No category found."
+                 />
               </div>
                 <div className="space-y-2">
                 <Label htmlFor="homeOffice">Home Office</Label>
@@ -215,20 +227,15 @@ export function StaffForm({ staffMember }: StaffFormProps) {
                 <Input id="contractualOffice" name="contractualOffice" value={formData.contractualOffice} onChange={handleChange} />
               </div>
                 <div className="space-y-2">
-                <Label htmlFor="region">Region</Label>
-                 <Select name="region" value={formData.region} onValueChange={(value) => handleSelectChange('region', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select region" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="NA">NA</SelectItem>
-                    <SelectItem value="EMEA">EMEA</SelectItem>
-                    <SelectItem value="APAC">APAC</SelectItem>
-                    <SelectItem value="LATAM">LATAM</SelectItem>
-                    <SelectItem value="Central">Central</SelectItem>
-                    <SelectItem value="Eastern">Eastern</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>Region</Label>
+                 <Combobox
+                  options={regions}
+                  selectedValue={formData.region}
+                  onSelect={(value) => handleSelectChange('region', value)}
+                  placeholder="Select region"
+                  searchPlaceholder="Search regions..."
+                  notFoundText="No region found."
+                 />
               </div>
             </CardContent>
           </Card>
@@ -365,3 +372,5 @@ export function StaffForm({ staffMember }: StaffFormProps) {
     </div>
   );
 }
+
+    

@@ -6,11 +6,11 @@ import { projectData, staffData } from '@/lib/data';
 import { useState, useEffect, useMemo } from 'react';
 import { format, isWithinInterval } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import type { DateRange } from 'react-day-picker';
 import { Button } from '@/components/ui/button';
+import { Combobox } from '@/components/ui/combobox';
 
 export type TimesheetEntry = {
   id: string;
@@ -80,7 +80,12 @@ const getInitialEntries = (): TimesheetEntry[] => {
     ]
 }
 
-const payTypes: TimesheetEntry['payType'][] = ['Regular', 'Overtime', 'Holiday'];
+const payTypes = [
+  { value: 'all', label: 'All Pay Types' },
+  { value: 'Regular', label: 'Regular' },
+  { value: 'Overtime', label: 'Overtime' },
+  { value: 'Holiday', label: 'Holiday' },
+];
 
 export default function AdminE6Page() {
   const [allEntries, setAllEntries] = useState<TimesheetEntry[]>([]);
@@ -115,6 +120,10 @@ export default function AdminE6Page() {
     setSelectedPayType('all');
     setDateRange(undefined);
   }
+  
+  const staffOptions = [{ value: 'all', label: 'All Staff' }, ...staffData.map(s => ({ value: s.id, label: s.name }))];
+  const projectOptions = [{ value: 'all', label: 'All Projects' }, ...projectData.map(p => ({ value: p.id, label: p.name }))];
+
 
   return (
     <AppLayout>
@@ -133,51 +142,36 @@ export default function AdminE6Page() {
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div className="space-y-2 lg:col-span-1">
                     <Label htmlFor="staff-select">Staff Member</Label>
-                    <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                        <SelectTrigger id="staff-select">
-                            <SelectValue placeholder="Select a staff member..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Staff</SelectItem>
-                            {staffData.map(staff => (
-                                <SelectItem key={staff.id} value={staff.id}>
-                                    {staff.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <Combobox
+                        options={staffOptions}
+                        selectedValue={selectedUserId}
+                        onSelect={setSelectedUserId}
+                        placeholder="Select staff"
+                        searchPlaceholder="Search staff..."
+                        notFoundText="No staff found."
+                    />
                 </div>
                 <div className="space-y-2 lg:col-span-1">
                     <Label htmlFor="project-select">Project</Label>
-                    <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
-                        <SelectTrigger id="project-select">
-                            <SelectValue placeholder="Select a project..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Projects</SelectItem>
-                            {projectData.map(project => (
-                                <SelectItem key={project.id} value={project.id}>
-                                    {project.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <Combobox
+                        options={projectOptions}
+                        selectedValue={selectedProjectId}
+                        onSelect={setSelectedProjectId}
+                        placeholder="Select project"
+                        searchPlaceholder="Search projects..."
+                        notFoundText="No project found."
+                    />
                 </div>
                 <div className="space-y-2 lg:col-span-1">
                     <Label htmlFor="pay-type-select">Pay Type</Label>
-                    <Select value={selectedPayType} onValueChange={setSelectedPayType}>
-                        <SelectTrigger id="pay-type-select">
-                            <SelectValue placeholder="Select a pay type..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Pay Types</SelectItem>
-                            {payTypes.map(type => (
-                                <SelectItem key={type} value={type}>
-                                    {type}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <Combobox
+                        options={payTypes}
+                        selectedValue={selectedPayType}
+                        onSelect={setSelectedPayType}
+                        placeholder="Select pay type"
+                        searchPlaceholder="Search types..."
+                        notFoundText="No type found."
+                    />
                 </div>
                  <div className="space-y-2 lg:col-span-1">
                     <Label htmlFor="date-range">Date Range</Label>
@@ -233,3 +227,5 @@ export default function AdminE6Page() {
     </AppLayout>
   );
 }
+
+    
