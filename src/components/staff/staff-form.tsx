@@ -47,25 +47,26 @@ export function StaffForm({ staffMember }: StaffFormProps) {
     region: staffMember?.region || '',
   });
 
-  const handleInfoExtracted = (info: any) => {
+  const handleInfoExtracted = useCallback((info: any) => {
     setFormData((prev) => ({
       ...prev,
       name: info.personal?.name || prev.name,
       email: info.personal?.email || prev.email,
       phone: info.personal?.phone || prev.phone,
+      address: info.personal?.address || prev.address,
     }));
     toast({
       title: 'Information Extracted',
       description: 'The form has been populated with data from the resume.',
     });
-  };
+  }, [toast]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectChange = useCallback((name: string, value: string) => {
+  const handleSelectChange = useCallback((name: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 
