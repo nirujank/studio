@@ -120,6 +120,12 @@ const allNavItems = [
     label: 'My Leave',
     role: 'staff',
   },
+  {
+    href: '/staff/e6',
+    icon: Clock,
+    label: 'E6',
+    role: 'staff',
+  },
 ];
 
 export function MainNav() {
