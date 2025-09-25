@@ -23,7 +23,7 @@ export function DatePicker({ name, defaultValue }: DatePickerProps) {
 
   return (
     <Popover>
-      <input type="hidden" name={name} value={date?.toISOString()} />
+      <input type="hidden" name={name} value={date?.toISOString() || ''} />
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
