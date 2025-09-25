@@ -73,7 +73,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
              <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
-                  Actions
+                  Requests
                   <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
