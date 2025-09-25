@@ -4,9 +4,12 @@ export type StaffMember = {
   name: string;
   email: string;
   avatar: string;
+  jobTitle: string;
   category: 'Engineering' | 'Design' | 'Product' | 'PCO' | 'Marketing';
-  employmentCategory: 'Full-time' | 'Part-time' | 'Contract';
+  jobCategory: 'Intern' | 'Casual' | 'Permanent' | 'On Contract';
+  employmentType: 'Full-time' | 'Part-time';
   region: 'NA' | 'EMEA' | 'APAC' | 'LATAM' | 'Central' | 'Eastern';
+  country: string;
   homeOffice: string;
   contractualOffice: string;
   tenantId: string;
@@ -16,6 +19,9 @@ export type StaffMember = {
       phone: string;
       address: string;
       dob: string;
+      emergencyContact: string;
+      contactPriority: string;
+      specialNeeds: string;
     };
     education: {
       degree: string;
@@ -58,9 +64,12 @@ export const staffData: StaffMember[] = [
     name: 'Alex Johnson',
     email: 'alex.j@invorg.com',
     avatar: 'https://picsum.photos/seed/101/200/200',
+    jobTitle: 'Senior Software Engineer',
     category: 'Engineering',
-    employmentCategory: 'Full-time',
+    jobCategory: 'Permanent',
+    employmentType: 'Full-time',
     region: 'NA',
+    country: 'USA',
     homeOffice: 'San Francisco, CA',
     contractualOffice: 'San Francisco, CA',
     tenantId: 'TEN-001',
@@ -70,6 +79,9 @@ export const staffData: StaffMember[] = [
         phone: '123-456-7890',
         address: '123 Tech Ave, Silicon Valley, CA',
         dob: '1990-05-15',
+        emergencyContact: 'Jane Doe (Spouse) - 111-222-3333',
+        contactPriority: 'High',
+        specialNeeds: 'None',
       },
       education: [
         {
@@ -124,9 +136,12 @@ export const staffData: StaffMember[] = [
     name: 'Maria Garcia',
     email: 'maria.g@invorg.com',
     avatar: 'https://picsum.photos/seed/102/200/200',
+    jobTitle: 'Lead Product Designer',
     category: 'Design',
-    employmentCategory: 'Full-time',
+    jobCategory: 'Permanent',
+    employmentType: 'Full-time',
     region: 'EMEA',
+    country: 'United Kingdom',
     homeOffice: 'London, UK',
     contractualOffice: 'London, UK',
     tenantId: 'TEN-002',
@@ -136,6 +151,9 @@ export const staffData: StaffMember[] = [
         phone: '+44 20 7946 0958',
         address: '45 Creative St, London, UK',
         dob: '1992-08-22',
+        emergencyContact: 'Luis Garcia (Brother) - +44 20 7946 0959',
+        contactPriority: 'Medium',
+        specialNeeds: 'None',
       },
       education: [
         {
@@ -178,9 +196,12 @@ export const staffData: StaffMember[] = [
     name: 'Chen Wei',
     email: 'chen.w@invorg.com',
     avatar: 'https://picsum.photos/seed/103/200/200',
+    jobTitle: 'Senior Product Manager',
     category: 'Product',
-    employmentCategory: 'Full-time',
+    jobCategory: 'Permanent',
+    employmentType: 'Full-time',
     region: 'APAC',
+    country: 'Singapore',
     homeOffice: 'Singapore',
     contractualOffice: 'Singapore',
     tenantId: 'TEN-001',
@@ -190,6 +211,9 @@ export const staffData: StaffMember[] = [
         phone: '+65 9123 4567',
         address: '78 Business Hub, Singapore',
         dob: '1988-11-30',
+        emergencyContact: 'Mei Lin (Wife) - +65 9876 5432',
+        contactPriority: 'High',
+        specialNeeds: 'None',
       },
       education: [
         {
@@ -225,9 +249,12 @@ export const staffData: StaffMember[] = [
     name: 'Samira Khan',
     email: 'samira.k@invorg.com',
     avatar: 'https://picsum.photos/seed/104/200/200',
+    jobTitle: 'PCO Manager',
     category: 'PCO',
-    employmentCategory: 'Full-time',
+    jobCategory: 'Permanent',
+    employmentType: 'Full-time',
     region: 'NA',
+    country: 'USA',
     homeOffice: 'New York, NY',
     contractualOffice: 'New York, NY',
     tenantId: 'TEN-002',
@@ -237,6 +264,9 @@ export const staffData: StaffMember[] = [
         phone: '987-654-3210',
         address: '456 Culture Ln, New York, NY',
         dob: '1985-02-20',
+        emergencyContact: 'Omar Khan (Husband) - 987-654-3211',
+        contactPriority: 'High',
+        specialNeeds: 'None',
       },
       education: [
          {
@@ -272,9 +302,12 @@ export const staffData: StaffMember[] = [
     name: 'Ben Carter',
     email: 'ben.c@invorg.com',
     avatar: 'https://picsum.photos/seed/105/200/200',
+    jobTitle: 'DevOps Engineer',
     category: 'Engineering',
-    employmentCategory: 'Contract',
+    jobCategory: 'On Contract',
+    employmentType: 'Full-time',
     region: 'EMEA',
+    country: 'Germany',
     homeOffice: 'Berlin, DE',
     contractualOffice: 'Remote',
     tenantId: 'TEN-003',
@@ -284,6 +317,9 @@ export const staffData: StaffMember[] = [
         phone: '+49 30 12345678',
         address: '101 Code Allee, Berlin, DE',
         dob: '1995-07-07',
+        emergencyContact: 'Klaus Mueller (Friend) - +49 30 87654321',
+        contactPriority: 'Low',
+        specialNeeds: 'None',
       },
       education: [
          {

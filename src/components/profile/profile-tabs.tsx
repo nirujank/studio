@@ -44,7 +44,7 @@ export function ProfileTabs({ user }: ProfileTabsProps) {
         <TabsTrigger value="volunteering" className="hidden md:flex"><HeartHandshake className="mr-2 h-4 w-4" />Volunteering</TabsTrigger>
       </TabsList>
       <TabsContent value="personal">
-        <PersonalInfoTab personalInfo={user.profile.personal} />
+        <PersonalInfoTab user={user} />
       </TabsContent>
       <TabsContent value="history">
         <JobHistoryTab jobHistory={user.jobHistory} />

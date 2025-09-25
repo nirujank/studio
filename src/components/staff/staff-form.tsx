@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { StaffMember, Tenant } from '@/lib/data';
@@ -29,11 +30,6 @@ type StaffFormProps = {
 type EducationEntry = { id: string; degree: string; university: string; year?: number };
 type ExperienceEntry = { id: string; position: string; company: string; startDate?: string; endDate?: string; summary?: string };
 
-const employmentCategories = [
-    { value: 'Full-time', label: 'Full-time' },
-    { value: 'Part-time', label: 'Part-time' },
-    { value: 'Contract', label: 'Contract' },
-];
 
 const jobCategories = [
     { value: 'Engineering', label: 'Engineering' },
@@ -43,6 +39,18 @@ const jobCategories = [
     { value: 'Marketing', label: 'Marketing' },
 ];
 
+const employmentJobCategories = [
+    { value: 'Intern', label: 'Intern' },
+    { value: 'Casual', label: 'Casual' },
+    { value: 'Permanent', label: 'Permanent' },
+    { value: 'On Contract', label: 'On Contract' },
+];
+
+const employmentTypes = [
+    { value: 'Full-time', label: 'Full-time' },
+    { value: 'Part-time', label: 'Part-time' },
+];
+
 const regions = [
     { value: 'NA', label: 'NA' },
     { value: 'EMEA', label: 'EMEA' },
@@ -50,6 +58,25 @@ const regions = [
     { value: 'LATAM', label: 'LATAM' },
     { value: 'Central', label: 'Central' },
     { value: 'Eastern', label: 'Eastern' },
+];
+
+// In a real app, this would come from an API
+const countries = [
+    { value: 'USA', label: 'USA' },
+    { value: 'United Kingdom', label: 'United Kingdom' },
+    { value: 'Singapore', label: 'Singapore' },
+    { value: 'Germany', label: 'Germany' },
+    { value: 'Canada', label: 'Canada' },
+    { value: 'Australia', label: 'Australia' },
+];
+
+const homeOffices = [
+    { value: 'San Francisco, CA', label: 'San Francisco, CA' },
+    { value: 'London, UK', label: 'London, UK' },
+    { value: 'Singapore', label: 'Singapore' },
+    { value: 'New York, NY', label: 'New York, NY' },
+    { value: 'Berlin, DE', label: 'Berlin, DE' },
+    { value: 'Remote', label: 'Remote' },
 ];
 
 
@@ -64,11 +91,17 @@ export function StaffForm({ staffMember }: StaffFormProps) {
     email: staffMember?.email || '',
     phone: staffMember?.profile.personal.phone || '',
     address: staffMember?.profile.personal.address || '',
+    emergencyContact: staffMember?.profile.personal.emergencyContact || '',
+    contactPriority: staffMember?.profile.personal.contactPriority || '',
+    specialNeeds: staffMember?.profile.personal.specialNeeds || '',
     tenantId: staffMember?.tenantId || '',
-    employmentCategory: staffMember?.employmentCategory || '',
+    jobTitle: staffMember?.jobTitle || '',
+    jobCategory: staffMember?.jobCategory || '',
     category: staffMember?.category || '',
+    employmentType: staffMember?.employmentType || '',
     homeOffice: staffMember?.homeOffice || '',
     contractualOffice: staffMember?.contractualOffice || '',
+    country: staffMember?.country || '',
     region: staffMember?.region || '',
   });
 
@@ -78,7 +111,7 @@ export function StaffForm({ staffMember }: StaffFormProps) {
     staffMember?.profile.education.map((e, i) => ({ ...e, id: `${uniqueId}-edu-${i}` })) || []
   );
   const [experience, setExperience] = useState<ExperienceEntry[]>(
-    staffMember?.jobHistory.map((e, i) => ({ ...e, endDate: e.endDate ?? '', id: `${uniqueId}-exp-${i}` })) || []
+    staffMember?.jobHistory.map((e, i) => ({ ...e, endDate: e.endDate ?? '', position: e.position, company: e.company, startDate: e.startDate, summary: 'summary' in e ? (e as any).summary : '', id: `${uniqueId}-exp-${i}` })) || []
   );
 
   const handleInfoExtracted = useCallback((info: ExtractInfoFromResumeOutput) => {
@@ -176,6 +209,18 @@ export function StaffForm({ staffMember }: StaffFormProps) {
                 <Label htmlFor="address">Address</Label>
                 <Textarea id="address" name="address" value={formData.address} onChange={handleChange} />
               </div>
+               <div className="space-y-2">
+                <Label htmlFor="emergencyContact">Emergency Contact</Label>
+                <Input id="emergencyContact" name="emergencyContact" value={formData.emergencyContact} onChange={handleChange} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="contactPriority">Contact Priority</Label>
+                <Input id="contactPriority" name="contactPriority" value={formData.contactPriority} onChange={handleChange} />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="specialNeeds">Special Need or Accessibility</Label>
+                <Input id="specialNeeds" name="specialNeeds" value={formData.specialNeeds} onChange={handleChange} />
+              </div>
             </CardContent>
           </Card>
 
@@ -185,6 +230,10 @@ export function StaffForm({ staffMember }: StaffFormProps) {
                <CardDescription>Work-related information.</CardDescription>
             </CardHeader>
             <CardContent className="grid sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="jobTitle">Job Title</Label>
+                <Input id="jobTitle" name="jobTitle" value={formData.jobTitle} onChange={handleChange} />
+              </div>
                <div className="space-y-2">
                 <Label>Tenant</Label>
                 <Combobox
@@ -196,19 +245,8 @@ export function StaffForm({ staffMember }: StaffFormProps) {
                   notFoundText="No tenant found."
                  />
               </div>
-              <div className="space-y-2">
-                <Label>Employment Category</Label>
-                <Combobox
-                  options={employmentCategories}
-                  selectedValue={formData.employmentCategory}
-                  onSelect={(value) => handleSelectChange('employmentCategory', value)}
-                  placeholder="Select category"
-                  searchPlaceholder="Search categories..."
-                  notFoundText="No category found."
-                 />
-              </div>
-              <div className="space-y-2">
-                <Label>Job Category</Label>
+               <div className="space-y-2">
+                <Label>Job Category (Functional)</Label>
                  <Combobox
                   options={jobCategories}
                   selectedValue={formData.category}
@@ -218,15 +256,40 @@ export function StaffForm({ staffMember }: StaffFormProps) {
                   notFoundText="No category found."
                  />
               </div>
-                <div className="space-y-2">
-                <Label htmlFor="homeOffice">Home Office</Label>
-                <Input id="homeOffice" name="homeOffice" value={formData.homeOffice} onChange={handleChange} />
+              <div className="space-y-2">
+                <Label>Job Category (Employment)</Label>
+                <Combobox
+                  options={employmentJobCategories}
+                  selectedValue={formData.jobCategory}
+                  onSelect={(value) => handleSelectChange('jobCategory', value)}
+                  placeholder="Select category"
+                  searchPlaceholder="Search categories..."
+                  notFoundText="No category found."
+                 />
+              </div>
+               <div className="space-y-2">
+                <Label>Employment Type</Label>
+                <Combobox
+                  options={employmentTypes}
+                  selectedValue={formData.employmentType}
+                  onSelect={(value) => handleSelectChange('employmentType', value)}
+                  placeholder="Select type"
+                  searchPlaceholder="Search types..."
+                  notFoundText="No type found."
+                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="contractualOffice">Contractual Office</Label>
-                <Input id="contractualOffice" name="contractualOffice" value={formData.contractualOffice} onChange={handleChange} />
+                <Label>Country</Label>
+                 <Combobox
+                  options={countries}
+                  selectedValue={formData.country}
+                  onSelect={(value) => handleSelectChange('country', value)}
+                  placeholder="Select country"
+                  searchPlaceholder="Search countries..."
+                  notFoundText="No country found."
+                 />
               </div>
-                <div className="space-y-2">
+              <div className="space-y-2">
                 <Label>Region</Label>
                  <Combobox
                   options={regions}
@@ -236,6 +299,21 @@ export function StaffForm({ staffMember }: StaffFormProps) {
                   searchPlaceholder="Search regions..."
                   notFoundText="No region found."
                  />
+              </div>
+               <div className="space-y-2">
+                <Label htmlFor="homeOffice">Home Office</Label>
+                 <Combobox
+                  options={homeOffices}
+                  selectedValue={formData.homeOffice}
+                  onSelect={(value) => handleSelectChange('homeOffice', value)}
+                  placeholder="Select home office"
+                  searchPlaceholder="Search offices..."
+                  notFoundText="No office found."
+                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="contractualOffice">Contractual Office</Label>
+                <Input id="contractualOffice" name="contractualOffice" value={formData.contractualOffice} onChange={handleChange} />
               </div>
             </CardContent>
           </Card>

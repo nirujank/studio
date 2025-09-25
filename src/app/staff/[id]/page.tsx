@@ -33,7 +33,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             </Avatar>
             <div>
               <h1 className="text-3xl font-bold font-headline">{user.name}</h1>
-              <p className="text-muted-foreground">{user.category} @ {user.region}</p>
+              <p className="text-muted-foreground">{user.jobTitle} @ {user.region}</p>
             </div>
           </div>
           <Button asChild>
