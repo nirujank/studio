@@ -7,7 +7,7 @@ import { ProjectForm } from '@/components/projects/project-form';
 export default function NewProjectPage() {
   return (
     <AppLayout>
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div className="flex items-center gap-4">
           <Button asChild variant="outline" size="icon">
             <Link href="/projects">
