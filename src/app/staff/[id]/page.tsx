@@ -18,9 +18,10 @@ import { currentUser as defaultUser } from '@/lib/data';
 import { useNotifications } from '@/hooks/use-notifications';
 import { useToast } from '@/hooks/use-toast';
 
-export default function ProfilePage({ params: { id } }: { params: { id: string } }) {
+export default function ProfilePage({ params }: { params: { id: string } }) {
   const { addNotification } = useNotifications();
   const { toast } = useToast();
+  const id = params.id;
   
   // A temporary hack to allow `/profile` to work for the current user link in the top nav
   if (id === 'profile') {
