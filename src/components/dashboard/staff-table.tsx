@@ -170,7 +170,7 @@ export function StaffTable({ staffData }: StaffTableProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem asChild>
-                        <Link href="/profile">View Profile</Link>
+                        <Link href={`/staff/${member.id}`}>View Profile</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem onSelect={() => handleEdit(member)}>Edit</DropdownMenuItem>
                       <DropdownMenuItem onSelect={() => handleResetPassword(member)}>
