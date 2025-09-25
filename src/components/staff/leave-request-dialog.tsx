@@ -28,6 +28,7 @@ import { DatePicker } from '../ui/date-picker';
 type LeaveRequestDialogProps = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
+  staffId?: string;
 };
 
 const initialState: LeaveRequestState = {};
@@ -47,7 +48,7 @@ function SubmitButton() {
   );
 }
 
-export function LeaveRequestDialog({ isOpen, onOpenChange }: LeaveRequestDialogProps) {
+export function LeaveRequestDialog({ isOpen, onOpenChange, staffId }: LeaveRequestDialogProps) {
   const [state, formAction, isPending] = useActionState(assessLeaveRequestAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const [isResetting, startResetTransition] = useTransition();
@@ -107,7 +108,7 @@ export function LeaveRequestDialog({ isOpen, onOpenChange }: LeaveRequestDialogP
           <form ref={formRef} action={formAction} className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="staffId">Staff Member</Label>
-              <Select name="staffId" required>
+              <Select name="staffId" required defaultValue={staffId} disabled={!!staffId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a staff member" />
                 </SelectTrigger>

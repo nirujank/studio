@@ -26,7 +26,6 @@ import {
   SidebarMenuButton,
   SidebarMenuSub,
   SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { useSidebar } from '../ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
@@ -103,33 +102,21 @@ const allNavItems = [
     ],
   },
   {
-    href: '/time-leave',
-    icon: Clock,
-    label: 'Time & Leave',
-    role: 'admin',
-  },
-  {
-    href: '/performance',
-    icon: TrendingUp,
-    label: 'Performance',
-    role: 'admin',
-  },
-  {
-    href: '/capacity',
-    icon: PieChart,
-    label: 'Capacity',
-    role: 'admin',
-  },
-  {
-    href: '/security',
-    icon: Shield,
-    label: 'Security',
-    role: 'admin',
-  },
-  {
     href: '/profile',
     icon: UserCircle,
     label: 'My Profile',
+    role: 'staff',
+  },
+  {
+    href: '/staff/my-projects',
+    icon: FolderKanban,
+    label: 'My Projects',
+    role: 'staff',
+  },
+  {
+    href: '/staff/my-leave',
+    icon: CalendarClock,
+    label: 'My Leave',
     role: 'staff',
   },
 ];
@@ -149,24 +136,18 @@ export function MainNav() {
   const getProfileLink = () => {
     if (typeof window !== 'undefined') {
       const userId = sessionStorage.getItem('userId');
-      if (userRole === 'staff' && userId) {
+      if (userId) {
         return `/staff/${userId}`;
       }
     }
-    return '/profile'; // Fallback for admin or if userId not found
+    return '/profile'; // Fallback
   }
 
   const navItems = allNavItems.filter(item => {
-    if (userRole === 'admin') {
-        // Admin sees everything except the staff-specific "My Profile"
-        return item.role === 'admin' || item.href === '/profile';
+    if (!userRole) { // Default to admin view if no role set (e.g., on server)
+      return item.role === 'admin';
     }
-    if (userRole === 'staff') {
-        // Staff only see "My Profile"
-        return item.role === 'staff';
-    }
-    // Default to admin view if no role set (e.g., on server)
-    return item.role === 'admin' || item.href === '/profile';
+    return item.role === userRole;
   });
 
 
@@ -176,7 +157,8 @@ export function MainNav() {
     }
     if (href === '/profile') {
         // Special handling for dynamic profile routes
-        return pathname.startsWith('/staff/');
+        const userId = typeof window !== 'undefined' ? sessionStorage.getItem('userId') : '';
+        return pathname === `/staff/${userId}`;
     }
     return pathname === href;
   };
